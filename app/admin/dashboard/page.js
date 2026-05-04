@@ -66,10 +66,8 @@ export default function AdminDashboard() {
       <div style={{ background: '#0A0A0A', borderBottom: '2px solid #E8000D', padding: '0 24px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '2px solid #E8000D', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', lineHeight: 1.1 }}>
-              <span style={{ fontFamily: "'Bebas Neue'", fontSize: 6, letterSpacing: 1, color: '#fff' }}>ELECTRIC</span>
-              <span style={{ fontFamily: "'Bebas Neue'", fontSize: 13, color: '#fff' }}>MINI</span>
-              <span style={{ fontFamily: "'Bebas Neue'", fontSize: 5, letterSpacing: 1, color: '#fff' }}>TÜRKİYE</span>
+            <div style={{ width: 36, height: 36 }}>
+              <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <span style={{ fontFamily: "'Bebas Neue'", fontSize: 18, letterSpacing: 2 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
             <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 2, color: '#555', textTransform: 'uppercase', borderLeft: '1px solid #222', paddingLeft: 12 }}>Admin Paneli</span>

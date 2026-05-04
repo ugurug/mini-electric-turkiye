@@ -90,10 +90,8 @@ export default function Home() {
       <nav style={{ background: '#0A0A0A', borderBottom: '2px solid #E8000D', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 24px', maxWidth: 960, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', border: '2px solid #E8000D', background: '#0A0A0A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', lineHeight: 1.1 }}>
-              <span style={{ fontFamily: "'Bebas Neue'", fontSize: 7, letterSpacing: 2, color: '#fff' }}>ELECTRIC</span>
-              <span style={{ fontFamily: "'Bebas Neue'", fontSize: 16, color: '#fff' }}>MINI</span>
-              <span style={{ fontFamily: "'Bebas Neue'", fontSize: 6, letterSpacing: 1.5, color: '#fff' }}>TÜRKİYE</span>
+            <div style={{ width: 44, height: 44 }}>
+              <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <span style={{ fontFamily: "'Bebas Neue'", fontSize: 20, letterSpacing: 2 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
           </div>
@@ -108,10 +106,8 @@ export default function Home() {
       {/* HERO */}
       <div style={{ background: '#111', borderBottom: '1px solid #222', padding: '60px 24px 48px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(139,0,0,0.04) 40px, rgba(139,0,0,0.04) 80px)', pointerEvents: 'none' }} />
-        <div style={{ width: 120, height: 120, borderRadius: '50%', background: '#0A0A0A', border: '3px solid #E8000D', margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 6px rgba(232,0,13,0.1)', flexDirection: 'column', lineHeight: 1.2 }}>
-          <span style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 3, color: '#fff' }}>ELECTRIC</span>
-          <span style={{ fontFamily: "'Bebas Neue'", fontSize: 30, color: '#fff' }}>MINI</span>
-          <span style={{ fontFamily: "'Bebas Neue'", fontSize: 10, letterSpacing: 2, color: '#fff' }}>TÜRKİYE</span>
+        <div style={{ width: 140, height: 140, margin: '0 auto 24px' }}>
+          <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <h1 style={{ fontFamily: "'Bebas Neue'", fontSize: 52, letterSpacing: 4, lineHeight: 1 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></h1>
         <p style={{ color: '#aaa', fontSize: 14, marginTop: 10, letterSpacing: 1, fontFamily: "'Barlow Condensed'", textTransform: 'uppercase' }}>Türkiye'nin Mini Electric Sahiplerinin Fan Kulübü</p>

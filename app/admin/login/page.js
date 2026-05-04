@@ -51,10 +51,8 @@ export default function AdminLogin() {
       <div style={{ width: '100%', maxWidth: 400, padding: 24 }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ width: 80, height: 80, borderRadius: '50%', border: '2px solid #E8000D', background: '#0A0A0A', margin: '0 auto 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', lineHeight: 1.2 }}>
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 8, letterSpacing: 2, color: '#fff' }}>ELECTRIC</span>
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 20, color: '#fff' }}>MINI</span>
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 7, letterSpacing: 1.5, color: '#fff' }}>TÜRKİYE</span>
+          <div style={{ width: 100, height: 100, margin: '0 auto 16px' }}>
+            <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
           <div style={{ fontFamily: "'Bebas Neue'", fontSize: 24, letterSpacing: 3, color: '#fff' }}>
             MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span>
