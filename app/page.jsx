@@ -145,7 +145,7 @@ export default function Home() {
               <div key={n.id} style={{ display: 'grid', gridTemplateColumns: '80px 1fr', borderBottom: '1px solid #1a1a1a', padding: '20px 0' }}>
                 <div style={{ fontFamily: "'Bebas Neue'", fontSize: 28, color: '#E8000D', paddingRight: 20, borderRight: '2px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
                   {day}
-                  <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 2, color: '#aaa', textTransform: 'uppercase', fontWeight: 600 }}>{month}</span>
+                  <p style={{ color: '#aaa', fontSize: 15, marginTop: 10, letterSpacing: 0.3, fontFamily: "'Barlow'", maxWidth: 600, margin: '12px auto 0', lineHeight: 1.7 }}>Türkiye'nin dört bir yanından MINI Electric tutkunlarını bir araya getiren, deneyimleri paylaşan ve elektrikli sürüşün keyfini çıkaran Türkiye'nin en büyük Elektrikli MINI topluluğu.</p>
                 </div>
                 <div style={{ paddingLeft: 20 }}>
                   <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{n.title}</div>
