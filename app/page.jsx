@@ -70,7 +70,7 @@ export default function Home() {
   return (
     <div style={{ background: '#0A0A0A', color: '#fff', fontFamily: "'Barlow', sans-serif", minHeight: '100vh' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         .nav-link { color: #aaa; text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; padding: 6px 12px; border-left: 1px solid #1f1f1f; transition: color 0.2s, background 0.2s; }
@@ -93,7 +93,7 @@ export default function Home() {
             <div style={{ width: 44, height: 44 }}>
               <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 20, letterSpacing: 2 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
+            <span style={{ fontFamily: "'Montserrat'", fontSize: 20, letterSpacing: 2 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
           </div>
           <div style={{ display: 'flex' }}>
             {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#sss','SSS'],['#sorunlar','Sorunlar'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
@@ -109,7 +109,7 @@ export default function Home() {
         <div style={{ width: 140, height: 140, margin: '0 auto 24px' }}>
           <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
-        <h1 style={{ fontFamily: "'Bebas Neue'", fontSize: 52, letterSpacing: 4, lineHeight: 1 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></h1>
+        <h1 style={{ fontFamily: "'Montserrat'", fontSize: 52, letterSpacing: 4, lineHeight: 1 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></h1>
         <p style={{ color: '#aaa', fontSize: 14, marginTop: 10, letterSpacing: 1, fontFamily: "'Barlow Condensed'" }}>Türkiye'nin dört bir yanından MINI Electric tutkunlarını bir araya getiren, deneyimleri paylaşan ve elektrikli sürüşün keyfini çıkaran Türkiye'nin en büyük Elektrikli MINI topluluğu.</p>
         <div style={{ width: 60, height: 3, background: '#E8000D', margin: '16px auto 0' }} />
       </div>
@@ -143,7 +143,7 @@ export default function Home() {
             const { day, month } = formatDate(n.created_at)
             return (
               <div key={n.id} style={{ display: 'grid', gridTemplateColumns: '80px 1fr', borderBottom: '1px solid #1a1a1a', padding: '20px 0' }}>
-                <div style={{ fontFamily: "'Bebas Neue'", fontSize: 28, color: '#E8000D', paddingRight: 20, borderRight: '2px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
+                <div style={{ fontFamily: "'Montserrat'", fontSize: 28, color: '#E8000D', paddingRight: 20, borderRight: '2px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
                   {day}
                   <p style={{ color: '#aaa', fontSize: 15, marginTop: 10, letterSpacing: 0.3, fontFamily: "'Barlow'", maxWidth: 600, margin: '12px auto 0', lineHeight: 1.7 }}>Türkiye'nin dört bir yanından MINI Electric tutkunlarını bir araya getiren, deneyimleri paylaşan ve elektrikli sürüşün keyfini çıkaran Türkiye'nin en büyük Elektrikli MINI topluluğu.</p>
                 </div>
@@ -220,7 +220,7 @@ export default function Home() {
 
           {/* COMMENT FORM */}
           <div style={{ background: '#111', border: '1px solid #222', padding: 24, marginTop: 8 }}>
-            <div style={{ fontFamily: "'Bebas Neue'", fontSize: 22, letterSpacing: 2, marginBottom: 16 }}>Yorum Ekle / Merkez Öner</div>
+            <div style={{ fontFamily: "'Montserrat'", fontSize: 22, letterSpacing: 2, marginBottom: 16 }}>Yorum Ekle / Merkez Öner</div>
             {commentSubmitted ? (
               <div style={{ color: '#27AE60', fontFamily: "'Barlow Condensed'", fontSize: 15, letterSpacing: 1 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
             ) : (
@@ -253,7 +253,7 @@ export default function Home() {
 
         {/* JOIN CTA */}
         <section id="kulup" style={{ padding: '64px 24px', textAlign: 'center', background: '#111', borderTop: '2px solid #E8000D' }}>
-          <h2 style={{ fontFamily: "'Bebas Neue'", fontSize: 40, letterSpacing: 3, marginBottom: 10 }}>KULÜBE KATIL</h2>
+          <h2 style={{ fontFamily: "'Montserrat'", fontSize: 40, letterSpacing: 3, marginBottom: 10 }}>KULÜBE KATIL</h2>
           <p style={{ color: '#aaa', fontSize: 14, marginBottom: 28 }}>Mini Electric Türkiye topluluğunun bir parçası ol.</p>
           <a href="https://www.jotform.com/form/251503841296053" target="_blank" rel="noreferrer" className="btn-red">Başvuru Formunu Doldur</a>
         </section>
@@ -270,7 +270,7 @@ function SectionHeader({ tag, title }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
       <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: 3, textTransform: 'uppercase', color: '#E8000D', fontWeight: 600, border: '1px solid #E8000D', padding: '3px 8px' }}>{tag}</div>
-      <div style={{ fontFamily: "'Bebas Neue'", fontSize: 32, letterSpacing: 2 }}>{title}</div>
+      <div style={{ fontFamily: "'Montserrat'", fontSize: 32, letterSpacing: 2 }}>{title}</div>
       <div style={{ flex: 1, height: 1, background: '#222' }} />
     </div>
   )
