@@ -110,7 +110,7 @@ export default function Home() {
           <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <h1 style={{ fontFamily: "'Bebas Neue'", fontSize: 52, letterSpacing: 4, lineHeight: 1 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></h1>
-        <p style={{ color: '#aaa', fontSize: 14, marginTop: 10, letterSpacing: 1, fontFamily: "'Barlow Condensed'", textTransform: 'uppercase' }}>Türkiye'nin Mini Electric Sahiplerinin Fan Kulübü</p>
+        <p style={{ color: '#aaa', fontSize: 14, marginTop: 10, letterSpacing: 1, fontFamily: "'Barlow Condensed'", textTransform: 'uppercase' }}>Türkiye'nin dört bir yanından MINI Electric tutkunlarını bir araya getiren, deneyimleri paylaşan ve elektrikli sürüşün keyfini çıkaran Türkiye'nin en büyük Elektrikli MINI topluluğu.</p>
         <div style={{ width: 60, height: 3, background: '#E8000D', margin: '16px auto 0' }} />
       </div>
 
