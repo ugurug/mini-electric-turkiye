@@ -220,7 +220,7 @@ export default function Home() {
                 </div>
                 <div className="news-content" style={{ paddingLeft: 20 }}>
                   <div style={{ fontFamily: "'Montserrat'", fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>{n.title}</div>
-                  <div style={{ color: '#aaa', fontSize: 13, lineHeight: 1.6 }}>{n.content}</div>
+                  <RenderText text={n.content} />
                 </div>
               </div>
             )
@@ -407,4 +407,24 @@ function CampaignCard({ campaign, active }) {
 
 function Empty({ text }) {
   return <div style={{ color: '#555', fontSize: 13, fontFamily: "'Inter'", padding: '20px 0' }}>{text}</div>
+}
+
+
+function RenderText({ text }) {
+  if (!text) return null
+  const urlRegex = /(https?:\/\/[^\s]+)/g
+  return (
+    <div style={{ color: '#aaa', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+      {text.split('\n').map((line, i) => (
+        <span key={i}>
+          {line.split(urlRegex).map((part, j) =>
+            urlRegex.test(part)
+              ? <a key={j} href={part} target="_blank" rel="noreferrer" style={{ color: '#E8000D', textDecoration: 'underline', wordBreak: 'break-all' }}>{part}</a>
+              : part
+          )}
+          {i < text.split('\n').length - 1 && <br />}
+        </span>
+      ))}
+    </div>
+  )
 }
