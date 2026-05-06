@@ -10,9 +10,8 @@ export default function Home() {
   const [comments, setComments] = useState([])
   const [openFaq, setOpenFaq] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [commentForm, setCommentForm] = useState({ author_name: '', content: '', center_id: '', suggested_center_name: '' })
+  const [commentForm, setCommentForm] = useState({ isim: '', soyisim: '', plaka: '', content: '', center_id: '', il: '', ilce: '', rating: 0 })
   const [commentSubmitted, setCommentSubmitted] = useState(false)
-  const [suggestingNewCenter, setSuggestingNewCenter] = useState(false)
   const [showFinalized, setShowFinalized] = useState(false)
 
   useEffect(() => {
@@ -40,19 +39,18 @@ export default function Home() {
   const handleCommentSubmit = async (e) => {
     e.preventDefault()
     const payload = {
-      author_name: commentForm.author_name,
+      isim: commentForm.isim,
+      soyisim: commentForm.soyisim,
+      plaka: commentForm.plaka,
       content: commentForm.content,
+      center_id: commentForm.center_id,
+      rating: commentForm.rating,
       approved: false,
-    }
-    if (suggestingNewCenter) {
-      payload.suggested_center_name = commentForm.suggested_center_name
-    } else {
-      payload.center_id = commentForm.center_id
     }
     const { error } = await supabase.from('washing_comments').insert([payload])
     if (!error) {
       setCommentSubmitted(true)
-      setCommentForm({ author_name: '', content: '', center_id: '', suggested_center_name: '' })
+      setCommentForm({ isim: '', soyisim: '', plaka: '', content: '', center_id: '', il: '', ilce: '', rating: 0 })
     }
   }
 
@@ -245,16 +243,17 @@ export default function Home() {
       </section>
 
       {/* WASHING */}
+      {/* WASHING */}
       <section id="yikama">
         <div className="section-inner">
           <SectionHeader tag="Topluluk" title="Araç Yıkama Merkezleri" />
           {centers.length === 0 ? <Empty text="Henüz yıkama merkezi eklenmedi." /> : centers.map(center => (
-            <div key={center.id} className="washing-center">
+            <div key={center.id} style={{ background: '#1A1A1A', border: '1px solid #2a2a2a', marginBottom: 16 }}>
               <div style={{ padding: '14px 20px', borderBottom: '1px solid #222', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ width: 36, height: 36, background: '#E8000D', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>🚿</div>
                 <div>
                   <div style={{ fontFamily: "'Montserrat'", fontSize: 15, fontWeight: 700, color: '#fff' }}>{center.name}</div>
-                  <div style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>{center.address}</div>
+                  <div style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>{center.il} / {center.ilce}</div>
                 </div>
               </div>
               <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -262,7 +261,11 @@ export default function Home() {
                   ? <div style={{ color: '#555', fontSize: 13 }}>Henüz yorum yok.</div>
                   : comments.filter(c => c.center_id === center.id).map(c => (
                     <div key={c.id} style={{ borderLeft: '3px solid #8B0000', paddingLeft: 12 }}>
-                      <div style={{ fontSize: 12, color: '#E8000D', fontWeight: 700, fontFamily: "'Inter'", marginBottom: 3 }}>{c.author_name}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                        <div style={{ fontSize: 12, color: '#E8000D', fontWeight: 700, fontFamily: "'Montserrat'" }}>{c.isim} {c.soyisim}</div>
+                        {c.plaka && <div style={{ fontSize: 11, color: '#555', fontFamily: "'Inter'", background: '#222', padding: '2px 6px' }}>{c.plaka}</div>}
+                        {c.rating && <div style={{ color: '#F5A623', fontSize: 13 }}>{'★'.repeat(c.rating)}{'☆'.repeat(5 - c.rating)}</div>}
+                      </div>
                       <div style={{ fontSize: 13, color: '#aaa', lineHeight: 1.5 }}>{c.content}</div>
                     </div>
                   ))}
@@ -270,32 +273,82 @@ export default function Home() {
             </div>
           ))}
 
-          {/* COMMENT FORM */}
+          {/* YORUM FORMU */}
           <div style={{ background: '#111', border: '1px solid #222', borderTop: '3px solid #E8000D', padding: '24px 20px', marginTop: 8 }}>
-            <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>Yorum Ekle / Merkez Öner</div>
+            <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>Yorum Ekle</div>
             {commentSubmitted ? (
-              <div style={{ color: '#27AE60', fontFamily: "'Inter'", fontSize: 14, fontWeight: 600 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
+              <div style={{ color: '#27AE60', fontFamily: "'Montserrat'", fontSize: 14, fontWeight: 600 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
             ) : (
               <form onSubmit={handleCommentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <input placeholder="Adınız" required value={commentForm.author_name} onChange={e => setCommentForm({ ...commentForm, author_name: e.target.value })} />
-                <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#aaa' }}>
-                    <input type="radio" name="centerType" style={{ width: 'auto' }} checked={!suggestingNewCenter} onChange={() => setSuggestingNewCenter(false)} />
-                    Mevcut merkez seç
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: '#aaa' }}>
-                    <input type="radio" name="centerType" style={{ width: 'auto' }} checked={suggestingNewCenter} onChange={() => setSuggestingNewCenter(true)} />
-                    Yeni merkez öner
-                  </label>
-                </div>
-                {suggestingNewCenter
-                  ? <input placeholder="Yıkama merkezi adı" value={commentForm.suggested_center_name} onChange={e => setCommentForm({ ...commentForm, suggested_center_name: e.target.value })} />
-                  : <select required={!suggestingNewCenter} value={commentForm.center_id} onChange={e => setCommentForm({ ...commentForm, center_id: e.target.value })}>
-                      <option value="">Merkez seçin...</option>
-                      {centers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+
+                {/* İL SEÇİMİ */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İl</div>
+                    <select required value={commentForm.il || ''} onChange={e => setCommentForm({ ...commentForm, il: e.target.value, ilce: '', center_id: '' })}>
+                      <option value="">İl seçin...</option>
+                      {[...new Set(centers.map(c => c.il))].sort().map(il => (
+                        <option key={il} value={il}>{il}</option>
+                      ))}
                     </select>
-                }
-                <textarea placeholder="Yorumunuz" rows={3} required value={commentForm.content} onChange={e => setCommentForm({ ...commentForm, content: e.target.value })} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İlçe</div>
+                    <select required value={commentForm.ilce || ''} onChange={e => setCommentForm({ ...commentForm, ilce: e.target.value, center_id: '' })} disabled={!commentForm.il}>
+                      <option value="">İlçe seçin...</option>
+                      {[...new Set(centers.filter(c => c.il === commentForm.il).map(c => c.ilce))].sort().map(ilce => (
+                        <option key={ilce} value={ilce}>{ilce}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* MERKEZ SEÇİMİ */}
+                <div>
+                  <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Yıkama Merkezi</div>
+                  <select required value={commentForm.center_id} onChange={e => setCommentForm({ ...commentForm, center_id: e.target.value })} disabled={!commentForm.ilce}>
+                    <option value="">Merkez seçin...</option>
+                    {centers.filter(c => c.il === commentForm.il && c.ilce === commentForm.ilce).map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* İSİM SOYİSİM - PLAKA */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İsim</div>
+                    <input required placeholder="İsim" value={commentForm.isim || ''} onChange={e => setCommentForm({ ...commentForm, isim: e.target.value })} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Soyisim</div>
+                    <input required placeholder="Soyisim" value={commentForm.soyisim || ''} onChange={e => setCommentForm({ ...commentForm, soyisim: e.target.value })} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Araç Plakası</div>
+                    <input required placeholder="34 ABC 123" value={commentForm.plaka || ''} onChange={e => setCommentForm({ ...commentForm, plaka: e.target.value.toUpperCase() })} />
+                  </div>
+                </div>
+
+                {/* YILDIZ PUANI */}
+                <div>
+                  <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Puanınız</div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {[1,2,3,4,5].map(n => (
+                      <button key={n} type="button" onClick={() => setCommentForm({ ...commentForm, rating: n })}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 28, color: n <= (commentForm.rating || 0) ? '#F5A623' : '#444', padding: 0, lineHeight: 1, transition: 'color 0.15s' }}>
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* YORUM */}
+                <div>
+                  <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Yorumunuz</div>
+                  <textarea placeholder="Deneyiminizi paylaşın..." rows={3} required value={commentForm.content} onChange={e => setCommentForm({ ...commentForm, content: e.target.value })} />
+                </div>
+
                 <button type="submit" className="btn-red" style={{ alignSelf: 'flex-start' }}>Gönder</button>
               </form>
             )}
