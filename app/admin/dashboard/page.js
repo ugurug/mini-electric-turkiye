@@ -69,7 +69,7 @@ export default function AdminDashboard() {
             <div style={{ width: 36, height: 36 }}>
               <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
-            <span style={{ fontFamily: "'Montserrat'", fontSize: 18, letterSpacing: 2 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
+            <span style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, color: '#fff' }}> MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
             <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 2, color: '#555', textTransform: 'uppercase', borderLeft: '1px solid #222', paddingLeft: 12 }}>Admin Paneli</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
