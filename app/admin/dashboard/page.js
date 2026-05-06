@@ -416,49 +416,175 @@ function CommentsTab() {
 function UsersTab() {
   const [users, setUsers] = useState([])
   const [form, setForm] = useState({ email: '', password: '', role: 'admin' })
+  const [editingUser, setEditingUser] = useState(null)
+  const [editForm, setEditForm] = useState({ password: '', role: 'admin' })
   const [showForm, setShowForm] = useState(false)
   const [message, setMessage] = useState('')
+  const [currentUserEmail, setCurrentUserEmail] = useState('')
 
-  useEffect(() => { fetchUsers() }, [])
+  const PROTECTED_EMAIL = 'ugurug@gmail.com'
+
+  useEffect(() => {
+    fetchUsers()
+    fetchCurrentUser()
+  }, [])
+
+  const fetchCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    setCurrentUserEmail(user?.email || '')
+  }
+
   const fetchUsers = async () => {
-    const { data } = await supabase.from('profiles').select('*')
+    const { data } = await supabase.from('profiles').select('*').order('created_at')
     setUsers(data || [])
   }
-  const handleSubmit = async (e) => {
+
+  const handleCreate = async (e) => {
     e.preventDefault()
     const { data, error } = await supabase.auth.signUp({ email: form.email, password: form.password })
     if (error) { setMessage('Hata: ' + error.message); return }
-    await supabase.from('profiles').insert([{ id: data.user.id, role: form.role }])
+    await supabase.from('profiles').insert([{ id: data.user.id, role: form.role, email: form.email }])
     setMessage('Admin başarıyla oluşturuldu.')
-    setForm({ email: '', password: '', role: 'admin' }); setShowForm(false); fetchUsers()
+    setForm({ email: '', password: '', role: 'admin' })
+    setShowForm(false)
+    fetchUsers()
   }
+
+  const handleEdit = (user) => {
+    setEditingUser(user)
+    setEditForm({ password: '', role: user.role })
+  }
+
+  const handleUpdate = async (e) => {
+    e.preventDefault()
+    if (editingUser.email === PROTECTED_EMAIL && currentUserEmail !== PROTECTED_EMAIL) {
+      setMessage('Bu kullanıcının bilgileri değiştirilemez.')
+      return
+    }
+    const updates = { role: editForm.role }
+    const { error: profileError } = await supabase.from('profiles').update(updates).eq('id', editingUser.id)
+    if (profileError) { setMessage('Hata: ' + profileError.message); return }
+
+    if (editForm.password) {
+      const { error: passError } = await supabase.functions.invoke('update-user-password', {
+        body: { userId: editingUser.id, password: editForm.password }
+      })
+      if (passError) {
+        setMessage('Profil güncellendi fakat şifre değiştirilemedi. Supabase Edge Function gerekli.')
+        setEditingUser(null)
+        fetchUsers()
+        return
+      }
+    }
+
+    setMessage('Kullanıcı güncellendi.')
+    setEditingUser(null)
+    fetchUsers()
+  }
+
+  const handleDelete = async (user) => {
+    if (user.email === PROTECTED_EMAIL) {
+      setMessage('Bu kullanıcı silinemez.')
+      return
+    }
+    if (!confirm(`${user.email} adlı kullanıcıyı silmek istediğinize emin misiniz?`)) return
+    await supabase.from('profiles').delete().eq('id', user.id)
+    setMessage('Kullanıcı silindi.')
+    fetchUsers()
+  }
+
+  const isProtected = (user) => user.email === PROTECTED_EMAIL && currentUserEmail !== PROTECTED_EMAIL
 
   return (
     <TabLayout title="Kullanıcı Yönetimi" onAdd={() => setShowForm(!showForm)}>
-      {message && <div style={{ background: '#111', border: '1px solid #27AE60', color: '#27AE60', padding: '10px 16px', marginBottom: 16, fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: 1 }}>{message}</div>}
+      {message && (
+        <div style={{ background: '#111', border: '1px solid #27AE60', color: '#27AE60', padding: '10px 16px', marginBottom: 16, fontFamily: "'Inter'", fontSize: 13 }}>
+          {message}
+          <button onClick={() => setMessage('')} style={{ float: 'right', background: 'none', border: 'none', color: '#27AE60', cursor: 'pointer', fontSize: 16 }}>×</button>
+        </div>
+      )}
+
+      {/* YENİ KULLANICI FORMU */}
       {showForm && (
         <FormBox title="Yeni Admin Oluştur">
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <div className="form-group"><label className="form-label">E-posta</label><input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
             <div className="form-group"><label className="form-label">Şifre</label><input type="password" required value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} /></div>
-            <div className="form-group"><label className="form-label">Rol</label>
+            <div className="form-group">
+              <label className="form-label">Rol</label>
               <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
-                <option value="admin">Admin</option><option value="super_admin">Süper Admin</option>
+                <option value="admin">Admin</option>
+                <option value="super_admin">Süper Admin</option>
               </select>
             </div>
-            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}><button type="submit" className="btn-red">Oluştur</button><button type="button" className="btn-gray" onClick={() => setShowForm(false)}>İptal</button></div>
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}>
+              <button type="submit" className="btn-red">Oluştur</button>
+              <button type="button" className="btn-gray" onClick={() => setShowForm(false)}>İptal</button>
+            </div>
           </form>
         </FormBox>
       )}
+
+      {/* DÜZENLEME FORMU */}
+      {editingUser && (
+        <FormBox title={`Düzenle: ${editingUser.email}`}>
+          <form onSubmit={handleUpdate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="form-group">
+              <label className="form-label">Yeni Şifre <span style={{ color: '#555', fontWeight: 400 }}>(boş bırakılırsa değişmez)</span></label>
+              <input type="password" placeholder="Yeni şifre..." value={editForm.password} onChange={e => setEditForm({ ...editForm, password: e.target.value })} disabled={isProtected(editingUser)} style={{ opacity: isProtected(editingUser) ? 0.4 : 1 }} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Rol</label>
+              <select value={editForm.role} onChange={e => setEditForm({ ...editForm, role: e.target.value })} disabled={isProtected(editingUser)} style={{ opacity: isProtected(editingUser) ? 0.4 : 1 }}>
+                <option value="admin">Admin</option>
+                <option value="super_admin">Süper Admin</option>
+              </select>
+            </div>
+            {isProtected(editingUser) && (
+              <div style={{ gridColumn: '1 / -1', color: '#E8000D', fontSize: 12, fontFamily: "'Inter'" }}>⚠ Bu kullanıcının bilgileri yalnızca kendisi tarafından değiştirilebilir.</div>
+            )}
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}>
+              {!isProtected(editingUser) && <button type="submit" className="btn-red">Güncelle</button>}
+              <button type="button" className="btn-gray" onClick={() => setEditingUser(null)}>İptal</button>
+            </div>
+          </form>
+        </FormBox>
+      )}
+
+      {/* KULLANICI LİSTESİ */}
       <table>
-        <thead><tr><th>Kullanıcı ID</th><th>Rol</th><th>Oluşturulma</th></tr></thead>
+        <thead>
+          <tr>
+            <th>E-posta</th>
+            <th>Rol</th>
+            <th>Oluşturulma</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
         <tbody>
-          {users.length === 0 && <tr><td colSpan={3} style={{ color: '#555', textAlign: 'center' }}>Henüz kullanıcı yok.</td></tr>}
+          {users.length === 0 && (
+            <tr><td colSpan={4} style={{ color: '#555', textAlign: 'center' }}>Henüz kullanıcı yok.</td></tr>
+          )}
           {users.map(u => (
             <tr key={u.id}>
-              <td style={{ color: '#aaa', fontSize: 11 }}>{u.id}</td>
-              <td><span className="badge" style={{ color: u.role === 'super_admin' ? '#E8000D' : '#aaa', border: `1px solid ${u.role === 'super_admin' ? '#E8000D' : '#444'}` }}>{u.role === 'super_admin' ? 'Süper Admin' : 'Admin'}</span></td>
+              <td style={{ color: '#fff' }}>
+                {u.email || <span style={{ color: '#555' }}>—</span>}
+                {u.email === PROTECTED_EMAIL && <span style={{ marginLeft: 8, fontSize: 10, color: '#E8000D', border: '1px solid #E8000D', padding: '2px 6px', fontFamily: "'Inter'", fontWeight: 600 }}>KORUNAN</span>}
+              </td>
+              <td>
+                <span className="badge" style={{ color: u.role === 'super_admin' ? '#E8000D' : '#aaa', border: `1px solid ${u.role === 'super_admin' ? '#E8000D' : '#444'}` }}>
+                  {u.role === 'super_admin' ? 'Süper Admin' : 'Admin'}
+                </span>
+              </td>
               <td>{new Date(u.created_at).toLocaleDateString('tr-TR')}</td>
+              <td>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn-gray" onClick={() => handleEdit(u)}>Düzenle</button>
+                  {u.email !== PROTECTED_EMAIL && (
+                    <button className="btn-danger" onClick={() => handleDelete(u)}>Sil</button>
+                  )}
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
