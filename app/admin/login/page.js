@@ -54,7 +54,7 @@ export default function AdminLogin() {
           <div style={{ width: 100, height: 100, margin: '0 auto 16px' }}>
             <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
-          <div style={{ fontFamily: "'Montserrat'", fontSize: 24, letterSpacing: 3, color: '#fff' }}>
+          <div style={{ fontFamily: "'Inter'", fontSize: 24, letterSpacing: 3, color: '#fff' }}>
             MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span>
           </div>
           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 3, color: '#555', textTransform: 'uppercase', marginTop: 4 }}>Admin Paneli</div>

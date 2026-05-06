@@ -67,19 +67,19 @@ export default function Home() {
   }
 
   return (
-    <div style={{ background: '#0A0A0A', color: '#fff', fontFamily: "'Montserrat', sans-serif", minHeight: '100vh' }}>
+    <div style={{ background: '#0A0A0A', color: '#fff', fontFamily: "'Inter', sans-serif", minHeight: '100vh' }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=Inter:wght@300;400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
 
-        .nav-link { color: #aaa; text-decoration: none; font-family: 'Montserrat', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; padding: 6px 10px; transition: color 0.2s; display: block; }
+        .nav-link { color: #aaa; text-decoration: none; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; padding: 6px 10px; transition: color 0.2s; display: block; }
         .nav-link:hover { color: #E8000D; }
 
-        .btn-red { display: inline-block; background: #E8000D; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; padding: 14px 32px; text-decoration: none; border: none; cursor: pointer; transition: background 0.2s; }
+        .btn-red { display: inline-block; background: #E8000D; color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; padding: 14px 32px; text-decoration: none; border: none; cursor: pointer; transition: background 0.2s; }
         .btn-red:hover { background: #c00; }
 
-        input, textarea, select { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 14px; font-family: 'Montserrat', sans-serif; font-size: 13px; width: 100%; outline: none; border-radius: 0; }
+        input, textarea, select { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 13px; width: 100%; outline: none; border-radius: 0; }
         input:focus, textarea:focus, select:focus { border-color: #E8000D; }
         select option { background: #1a1a1a; }
 
@@ -116,7 +116,7 @@ export default function Home() {
           .issue-status { margin-left: 0 !important; }
         }
 
-        .faq-q { padding: 14px 18px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 600; color: #fff; display: flex; justify-content: space-between; align-items: center; background: #1A1A1A; user-select: none; gap: 12px; }
+        .faq-q { padding: 14px 18px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #fff; display: flex; justify-content: space-between; align-items: center; background: #1A1A1A; user-select: none; gap: 12px; }
         .faq-q:hover { background: #1f1f1f; }
 
         .washing-center { background: #1A1A1A; border: 1px solid #2a2a2a; margin-bottom: 16px; }
@@ -166,7 +166,7 @@ export default function Home() {
         <h1 className="hero-title" style={{ fontFamily: "'Montserrat'", fontWeight: 900, color: '#fff', lineHeight: 1.1 }}>
           MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span>
         </h1>
-        <p style={{ color: '#aaa', fontSize: 14, marginTop: 16, fontFamily: "'Montserrat'", fontWeight: 400, maxWidth: 580, margin: '16px auto 0', lineHeight: 1.8 }}>
+        <p style={{ color: '#aaa', fontSize: 14, marginTop: 16, fontFamily: "'Inter'", fontWeight: 400, maxWidth: 580, margin: '16px auto 0', lineHeight: 1.8 }}>
           Türkiye'nin dört bir yanından MINI Electric tutkunlarını bir araya getiren, deneyimleri paylaşan ve elektrikli sürüşün keyfini çıkaran Türkiye'nin en büyük Elektrikli MINI topluluğu.
         </p>
         <div style={{ width: 50, height: 3, background: '#E8000D', margin: '20px auto 0' }} />
@@ -204,9 +204,9 @@ export default function Home() {
             const { day, month } = formatDate(n.created_at)
             return (
               <div key={n.id} className="news-item">
-                <div className="news-date" style={{ fontFamily: "'Montserrat'", fontWeight: 800, fontSize: 26, color: '#E8000D', paddingRight: 20, borderRight: '2px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
+                <div className="news-date" style={{ fontFamily: "'Inter'", fontWeight: 800, fontSize: 26, color: '#E8000D', paddingRight: 20, borderRight: '2px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}>
                   {day}
-                  <span style={{ fontFamily: "'Montserrat'", fontSize: 10, letterSpacing: 1, color: '#aaa', textTransform: 'uppercase', fontWeight: 600, marginTop: 2 }}>{month}</span>
+                  <span style={{ fontFamily: "'Inter'", fontSize: 10, letterSpacing: 1, color: '#aaa', textTransform: 'uppercase', fontWeight: 600, marginTop: 2 }}>{month}</span>
                 </div>
                 <div className="news-content" style={{ paddingLeft: 20 }}>
                   <div style={{ fontFamily: "'Montserrat'", fontSize: 15, fontWeight: 700, color: '#fff', marginBottom: 6 }}>{n.title}</div>
@@ -253,7 +253,7 @@ export default function Home() {
                     <div style={{ fontFamily: "'Montserrat'", fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{i.title}</div>
                     <div style={{ color: '#aaa', fontSize: 13, lineHeight: 1.5 }}>{i.description}</div>
                   </div>
-                  <div className="issue-status" style={{ fontFamily: "'Montserrat'", fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', padding: '3px 8px', fontWeight: 600, flexShrink: 0, color: statusColor(i.status), border: `1px solid ${statusColor(i.status)}`, marginLeft: 'auto' }}>{statusLabel(i.status)}</div>
+                  <div className="issue-status" style={{ fontFamily: "'Inter'", fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', padding: '3px 8px', fontWeight: 600, flexShrink: 0, color: statusColor(i.status), border: `1px solid ${statusColor(i.status)}`, marginLeft: 'auto' }}>{statusLabel(i.status)}</div>
                 </div>
               ))}
             </div>
@@ -279,7 +279,7 @@ export default function Home() {
                   ? <div style={{ color: '#555', fontSize: 13 }}>Henüz yorum yok.</div>
                   : comments.filter(c => c.center_id === center.id).map(c => (
                     <div key={c.id} style={{ borderLeft: '3px solid #8B0000', paddingLeft: 12 }}>
-                      <div style={{ fontSize: 12, color: '#E8000D', fontWeight: 700, fontFamily: "'Montserrat'", marginBottom: 3 }}>{c.author_name}</div>
+                      <div style={{ fontSize: 12, color: '#E8000D', fontWeight: 700, fontFamily: "'Inter'", marginBottom: 3 }}>{c.author_name}</div>
                       <div style={{ fontSize: 13, color: '#aaa', lineHeight: 1.5 }}>{c.content}</div>
                     </div>
                   ))}
@@ -291,7 +291,7 @@ export default function Home() {
           <div style={{ background: '#111', border: '1px solid #222', borderTop: '3px solid #E8000D', padding: '24px 20px', marginTop: 8 }}>
             <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>Yorum Ekle / Merkez Öner</div>
             {commentSubmitted ? (
-              <div style={{ color: '#27AE60', fontFamily: "'Montserrat'", fontSize: 14, fontWeight: 600 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
+              <div style={{ color: '#27AE60', fontFamily: "'Inter'", fontSize: 14, fontWeight: 600 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
             ) : (
               <form onSubmit={handleCommentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <input placeholder="Adınız" required value={commentForm.author_name} onChange={e => setCommentForm({ ...commentForm, author_name: e.target.value })} />
@@ -341,7 +341,7 @@ export default function Home() {
 function SectionHeader({ tag, title }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
-      <div style={{ fontFamily: "'Montserrat'", fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#E8000D', fontWeight: 700, border: '1px solid #E8000D', padding: '3px 8px', flexShrink: 0 }}>{tag}</div>
+      <div style={{ fontFamily: "'Inter'", fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#E8000D', fontWeight: 700, border: '1px solid #E8000D', padding: '3px 8px', flexShrink: 0 }}>{tag}</div>
       <div style={{ fontFamily: "'Montserrat'", fontSize: 26, fontWeight: 900, letterSpacing: 1 }}>{title}</div>
       <div style={{ flex: 1, height: 1, background: '#222', minWidth: 20 }} />
     </div>
@@ -351,12 +351,12 @@ function SectionHeader({ tag, title }) {
 function CampaignCard({ campaign, active }) {
   return (
     <div style={{ background: '#1A1A1A', border: '1px solid #333', borderTop: `3px solid ${active ? '#E8000D' : '#444'}`, padding: 20, opacity: active ? 1 : 0.7 }}>
-      <span style={{ display: 'inline-block', fontFamily: "'Montserrat'", fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, padding: '3px 10px', marginBottom: 12, background: active ? '#E8000D' : '#333', color: active ? '#fff' : '#aaa' }}>
+      <span style={{ display: 'inline-block', fontFamily: "'Inter'", fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, padding: '3px 10px', marginBottom: 12, background: active ? '#E8000D' : '#333', color: active ? '#fff' : '#aaa' }}>
         {active ? 'Aktif' : 'Tamamlandı'}
       </span>
       <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{campaign.title}</div>
       <div style={{ color: '#aaa', fontSize: 13, lineHeight: 1.6, marginBottom: 14 }}>{campaign.description}</div>
-      <div style={{ fontSize: 11, color: '#666', fontFamily: "'Montserrat'", letterSpacing: 0.5 }}>
+      <div style={{ fontSize: 11, color: '#666', fontFamily: "'Inter'", letterSpacing: 0.5 }}>
         <span style={{ color: '#E8000D', fontWeight: 600 }}>Başlangıç:</span> {new Date(campaign.start_at).toLocaleDateString('tr-TR')}
         &nbsp;|&nbsp;
         <span style={{ color: '#E8000D', fontWeight: 600 }}>Bitiş:</span> {new Date(campaign.end_at).toLocaleDateString('tr-TR')}
@@ -366,5 +366,5 @@ function CampaignCard({ campaign, active }) {
 }
 
 function Empty({ text }) {
-  return <div style={{ color: '#555', fontSize: 13, fontFamily: "'Montserrat'", padding: '20px 0' }}>{text}</div>
+  return <div style={{ color: '#555', fontSize: 13, fontFamily: "'Inter'", padding: '20px 0' }}>{text}</div>
 }

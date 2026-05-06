@@ -69,7 +69,7 @@ export default function AdminDashboard() {
             <div style={{ width: 36, height: 36 }}>
               <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
-            <span style={{ fontFamily: "'Montserrat'", fontSize: 18, letterSpacing: 2 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
+            <span style={{ fontFamily: "'Inter'", fontSize: 18, letterSpacing: 2 }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
             <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 2, color: '#555', textTransform: 'uppercase', borderLeft: '1px solid #222', paddingLeft: 12 }}>Admin Paneli</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -520,7 +520,7 @@ function TabLayout({ title, children, onAdd, showAdd = true }) {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div style={{ fontFamily: "'Montserrat'", fontSize: 28, letterSpacing: 2 }}>{title}</div>
+        <div style={{ fontFamily: "'Inter'", fontSize: 28, letterSpacing: 2 }}>{title}</div>
         {showAdd && <button className="btn-red" onClick={onAdd}>+ Yeni Ekle</button>}
       </div>
       {children}
