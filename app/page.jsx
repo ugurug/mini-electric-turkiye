@@ -14,6 +14,7 @@ export default function Home() {
   const [commentForm, setCommentForm] = useState({ author_name: '', content: '', center_id: '', suggested_center_name: '' })
   const [commentSubmitted, setCommentSubmitted] = useState(false)
   const [suggestingNewCenter, setSuggestingNewCenter] = useState(false)
+  const [showFinalized, setShowFinalized] = useState(false)
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -175,7 +176,7 @@ export default function Home() {
       {/* ACTIVE CAMPAIGNS */}
       <section id="kampanyalar">
         <div className="section-inner">
-          <SectionHeader tag="Aktif" title="Kampanyalar" />
+          <SectionHeader tag="Aktif" title="Güncel Kampanyalar" />
           {activeCampaigns.length === 0 ? <Empty text="Şu an aktif kampanya bulunmuyor." /> : (
             <div className="campaign-grid">
               {activeCampaigns.map(c => <CampaignCard key={c.id} campaign={c} active />)}
@@ -188,10 +189,19 @@ export default function Home() {
       {finalizedCampaigns.length > 0 && (
         <section>
           <div className="section-inner">
-            <SectionHeader tag="Tamamlandı" title="Geçmiş Kampanyalar" />
-            <div className="campaign-grid">
-              {finalizedCampaigns.map(c => <CampaignCard key={c.id} campaign={c} active={false} />)}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: showFinalized ? 24 : 0, flexWrap: 'wrap' }}>
+              <div style={{ fontFamily: "'Inter'", fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#555', fontWeight: 700, border: '1px solid #333', padding: '3px 8px', flexShrink: 0 }}>Arşiv</div>
+              <div style={{ fontFamily: "'Montserrat'", fontSize: 26, fontWeight: 900, letterSpacing: 1 }}>Geçmiş Kampanyalar</div>
+              <div style={{ flex: 1, height: 1, background: '#222', minWidth: 20 }} />
+              <button onClick={() => setShowFinalized(!showFinalized)} style={{ background: 'none', border: '1px solid #333', color: '#aaa', fontFamily: "'Inter'", fontSize: 12, fontWeight: 600, padding: '6px 14px', cursor: 'pointer', letterSpacing: 0.5, transition: 'all 0.2s', flexShrink: 0 }}>
+                {showFinalized ? '▲ Gizle' : '▼ Göster'}
+              </button>
             </div>
+            {showFinalized && (
+              <div className="campaign-grid">
+                {finalizedCampaigns.map(c => <CampaignCard key={c.id} campaign={c} active={false} />)}
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -351,9 +361,6 @@ function SectionHeader({ tag, title }) {
 function CampaignCard({ campaign, active }) {
   return (
     <div style={{ background: '#1A1A1A', border: '1px solid #333', borderTop: `3px solid ${active ? '#E8000D' : '#444'}`, padding: 20, opacity: active ? 1 : 0.7 }}>
-      <span style={{ display: 'inline-block', fontFamily: "'Inter'", fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', fontWeight: 700, padding: '3px 10px', marginBottom: 12, background: active ? '#E8000D' : '#333', color: active ? '#fff' : '#aaa' }}>
-        {active ? 'Aktif' : 'Tamamlandı'}
-      </span>
       <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{campaign.title}</div>
       <div style={{ color: '#aaa', fontSize: 13, lineHeight: 1.6, marginBottom: 14 }}>{campaign.description}</div>
       <div style={{ fontSize: 11, color: '#666', fontFamily: "'Inter'", letterSpacing: 0.5 }}>
