@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
+import { iller } from '../../lib/iller'
 
 const TABS = ['Kampanyalar', 'Haberler', 'SSS', 'Yıkama Merkezleri', 'Yıkama Yorumları', 'Kullanıcılar']
 
@@ -322,92 +323,234 @@ function FaqTab() {
 /* ─── WASHING CENTERS ─── */
 function CentersTab() {
   const [items, setItems] = useState([])
-  const [form, setForm] = useState({ name: '', address: '', notes: '' })
+  const [form, setForm] = useState({ name: '', il: '', ilce: '' })
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
+  const [selectedIl, setSelectedIl] = useState('')
 
   useEffect(() => { fetchItems() }, [])
+
   const fetchItems = async () => {
-    const { data } = await supabase.from('washing_centers').select('*').order('created_at', { ascending: false })
+    const { data } = await supabase.from('washing_centers').select('*').order('il').order('ilce').order('name')
     setItems(data || [])
   }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (editing) { await supabase.from('washing_centers').update(form).eq('id', editing) }
-    else { await supabase.from('washing_centers').insert([{ ...form, approved: true, source: 'admin' }]) }
-    setForm({ name: '', address: '', notes: '' }); setEditing(null); setShowForm(false); fetchItems()
+    if (editing) {
+      await supabase.from('washing_centers').update(form).eq('id', editing)
+    } else {
+      await supabase.from('washing_centers').insert([{ ...form, approved: true }])
+    }
+    setForm({ name: '', il: '', ilce: '' }); setEditing(null); setShowForm(false); setSelectedIl(''); fetchItems()
   }
-  const handleEdit = (item) => { setForm({ name: item.name, address: item.address || '', notes: item.notes || '' }); setEditing(item.id); setShowForm(true) }
-  const handleDelete = async (id) => { if (confirm('Bu merkezi silmek istiyor musunuz?')) { await supabase.from('washing_centers').delete().eq('id', id); fetchItems() } }
-  const toggleApprove = async (item) => { await supabase.from('washing_centers').update({ approved: !item.approved }).eq('id', item.id); fetchItems() }
+
+  const handleEdit = (item) => {
+    setForm({ name: item.name, il: item.il || '', ilce: item.ilce || '' })
+    setSelectedIl(item.il || '')
+    setEditing(item.id); setShowForm(true)
+  }
+
+  const handleDelete = async (id) => {
+    if (confirm('Bu merkezi silmek istiyor musunuz?')) {
+      await supabase.from('washing_centers').delete().eq('id', id); fetchItems()
+    }
+  }
+
+  const ilceler = iller.find(i => i.il === (editing ? form.il : selectedIl))?.ilceler || []
+
+  // İllere göre grupla
+  const grouped = items.reduce((acc, item) => {
+    const key = `${item.il || 'Belirtilmemiş'} / ${item.ilce || 'Belirtilmemiş'}`
+    if (!acc[key]) acc[key] = []
+    acc[key].push(item)
+    return acc
+  }, {})
 
   return (
-    <TabLayout title="Yıkama Merkezleri" onAdd={() => { setForm({ name: '', address: '', notes: '' }); setEditing(null); setShowForm(!showForm) }}>
+    <TabLayout title="Yıkama Merkezleri" onAdd={() => { setForm({ name: '', il: '', ilce: '' }); setEditing(null); setSelectedIl(''); setShowForm(!showForm) }}>
       {showForm && (
-        <FormBox title={editing ? 'Merkezi Düzenle' : 'Yeni Merkez'}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div className="form-group"><label className="form-label">Merkez Adı</label><input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
-            <div className="form-group"><label className="form-label">Adres</label><input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} /></div>
-            <div className="form-group"><label className="form-label">Notlar</label><textarea rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} /></div>
-            <div style={{ display: 'flex', gap: 8 }}><button type="submit" className="btn-red">{editing ? 'Güncelle' : 'Kaydet'}</button><button type="button" className="btn-gray" onClick={() => { setShowForm(false); setEditing(null) }}>İptal</button></div>
+        <FormBox title={editing ? 'Merkezi Düzenle' : 'Yeni Merkez Ekle'}>
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+            <div className="form-group">
+              <label className="form-label">İl</label>
+              <select required value={form.il} onChange={e => { setForm({ ...form, il: e.target.value, ilce: '' }); setSelectedIl(e.target.value) }}>
+                <option value="">İl seçin...</option>
+                {iller.map(i => <option key={i.il} value={i.il}>{i.il}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">İlçe</label>
+              <select required value={form.ilce} onChange={e => setForm({ ...form, ilce: e.target.value })} disabled={!form.il}>
+                <option value="">İlçe seçin...</option>
+                {ilceler.map(i => <option key={i} value={i}>{i}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Merkez Adı</label>
+              <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Yıkama merkezi adı" />
+            </div>
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}>
+              <button type="submit" className="btn-red">{editing ? 'Güncelle' : 'Kaydet'}</button>
+              <button type="button" className="btn-gray" onClick={() => { setShowForm(false); setEditing(null) }}>İptal</button>
+            </div>
           </form>
         </FormBox>
       )}
-      <table>
-        <thead><tr><th>Merkez Adı</th><th>Adres</th><th>Kaynak</th><th>Durum</th><th>İşlemler</th></tr></thead>
-        <tbody>
-          {items.length === 0 && <tr><td colSpan={5} style={{ color: '#555', textAlign: 'center' }}>Henüz merkez yok.</td></tr>}
-          {items.map(item => (
-            <tr key={item.id}>
-              <td style={{ color: '#fff', fontWeight: 600 }}>{item.name}</td>
-              <td>{item.address}</td>
-              <td><span className="badge" style={{ color: item.source === 'admin' ? '#aaa' : '#F5A623', border: `1px solid ${item.source === 'admin' ? '#444' : '#F5A623'}` }}>{item.source === 'admin' ? 'Admin' : 'Kullanıcı'}</span></td>
-              <td><button onClick={() => toggleApprove(item)} className="badge" style={{ color: item.approved ? '#27AE60' : '#E8000D', border: `1px solid ${item.approved ? '#27AE60' : '#E8000D'}`, background: 'none', cursor: 'pointer' }}>{item.approved ? 'Onaylı' : 'Beklemede'}</button></td>
-              <td><div style={{ display: 'flex', gap: 8 }}><button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button><button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button></div></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      {Object.keys(grouped).length === 0 && <Empty text="Henüz yıkama merkezi yok." />}
+      {Object.entries(grouped).map(([group, centers]) => (
+        <div key={group} style={{ marginBottom: 24 }}>
+          <div style={{ fontFamily: "'Montserrat'", fontSize: 12, fontWeight: 700, color: '#E8000D', letterSpacing: 1, textTransform: 'uppercase', borderBottom: '1px solid #222', paddingBottom: 8, marginBottom: 12 }}>{group}</div>
+          <table>
+            <thead><tr><th>Merkez Adı</th><th>İşlemler</th></tr></thead>
+            <tbody>
+              {centers.map(item => (
+                <tr key={item.id}>
+                  <td style={{ color: '#fff', fontWeight: 600 }}>{item.name}</td>
+                  <td><div style={{ display: 'flex', gap: 8 }}>
+                    <button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button>
+                    <button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button>
+                  </div></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </TabLayout>
   )
 }
 
 /* ─── WASHING COMMENTS ─── */
 function CommentsTab() {
-  const [items, setItems] = useState([])
+  const [pending, setPending] = useState([])
+  const [approved, setApproved] = useState([])
   const [centers, setCenters] = useState([])
+  const [editingComment, setEditingComment] = useState(null)
+  const [editForm, setEditForm] = useState({ isim: '', soyisim: '', plaka: '', content: '', rating: 5 })
 
-  useEffect(() => { fetchItems() }, [])
-  const fetchItems = async () => {
+  useEffect(() => { fetchAll() }, [])
+
+  const fetchAll = async () => {
     const [c, wc] = await Promise.all([
       supabase.from('washing_comments').select('*').order('created_at', { ascending: false }),
-      supabase.from('washing_centers').select('id, name')
+      supabase.from('washing_centers').select('id, name, il, ilce')
     ])
-    setItems(c.data || [])
+    setPending((c.data || []).filter(x => !x.approved))
+    setApproved((c.data || []).filter(x => x.approved))
     setCenters(wc.data || [])
   }
-  const toggleApprove = async (item) => { await supabase.from('washing_comments').update({ approved: !item.approved }).eq('id', item.id); fetchItems() }
-  const handleDelete = async (id) => { if (confirm('Bu yorumu silmek istiyor musunuz?')) { await supabase.from('washing_comments').delete().eq('id', id); fetchItems() } }
-  const centerName = (id) => centers.find(c => c.id === id)?.name || '—'
+
+  const centerLabel = (id) => {
+    const c = centers.find(c => c.id === id)
+    return c ? `${c.il} / ${c.ilce} — ${c.name}` : '—'
+  }
+
+  const toggleApprove = async (item) => {
+    await supabase.from('washing_comments').update({ approved: !item.approved }).eq('id', item.id)
+    fetchAll()
+  }
+
+  const handleDelete = async (id) => {
+    if (confirm('Bu yorumu silmek istiyor musunuz?')) {
+      await supabase.from('washing_comments').delete().eq('id', id); fetchAll()
+    }
+  }
+
+  const handleEdit = (item) => {
+    setEditingComment(item)
+    setEditForm({ isim: item.isim || '', soyisim: item.soyisim || '', plaka: item.plaka || '', content: item.content || '', rating: item.rating || 5 })
+  }
+
+  const handleUpdate = async (e) => {
+    e.preventDefault()
+    await supabase.from('washing_comments').update(editForm).eq('id', editingComment.id)
+    setEditingComment(null); fetchAll()
+  }
+
+  const Stars = ({ rating }) => (
+    <span style={{ color: '#F5A623', fontSize: 14 }}>
+      {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
+    </span>
+  )
+
+  const CommentRow = ({ item, isPending }) => (
+    <tr>
+      <td style={{ color: '#fff' }}>{item.isim} {item.soyisim}</td>
+      <td style={{ color: '#aaa', fontSize: 12 }}>{item.plaka}</td>
+      <td style={{ fontSize: 12 }}>{centerLabel(item.center_id)}</td>
+      <td><Stars rating={item.rating || 0} /></td>
+      <td style={{ maxWidth: 200, color: '#aaa', fontSize: 13 }}>{item.content}</td>
+      <td style={{ fontSize: 11, color: '#666' }}>{new Date(item.created_at).toLocaleDateString('tr-TR')}</td>
+      <td>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button>
+          <button onClick={() => toggleApprove(item)} style={{ background: 'none', border: `1px solid ${isPending ? '#27AE60' : '#F5A623'}`, color: isPending ? '#27AE60' : '#F5A623', padding: '6px 10px', fontFamily: "'Inter'", fontSize: 11, fontWeight: 600, cursor: 'pointer', letterSpacing: 0.5 }}>
+            {isPending ? '✓ Onayla' : '↩ Beklet'}
+          </button>
+          <button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button>
+        </div>
+      </td>
+    </tr>
+  )
+
+  const tableHead = (
+    <thead><tr><th>İsim Soyisim</th><th>Plaka</th><th>Merkez</th><th>Puan</th><th>Yorum</th><th>Tarih</th><th>İşlemler</th></tr></thead>
+  )
 
   return (
     <TabLayout title="Yıkama Yorumları" showAdd={false}>
-      <table>
-        <thead><tr><th>Yazar</th><th>Merkez</th><th>Yorum</th><th>Tarih</th><th>Durum</th><th>İşlemler</th></tr></thead>
-        <tbody>
-          {items.length === 0 && <tr><td colSpan={6} style={{ color: '#555', textAlign: 'center' }}>Henüz yorum yok.</td></tr>}
-          {items.map(item => (
-            <tr key={item.id}>
-              <td style={{ color: '#fff', fontWeight: 600 }}>{item.author_name}</td>
-              <td>{item.center_id ? centerName(item.center_id) : <span style={{ color: '#F5A623' }}>Öneri: {item.suggested_center_name}</span>}</td>
-              <td style={{ maxWidth: 280 }}>{item.content}</td>
-              <td>{new Date(item.created_at).toLocaleDateString('tr-TR')}</td>
-              <td><button onClick={() => toggleApprove(item)} className="badge" style={{ color: item.approved ? '#27AE60' : '#E8000D', border: `1px solid ${item.approved ? '#27AE60' : '#E8000D'}`, background: 'none', cursor: 'pointer' }}>{item.approved ? 'Onaylı' : 'Beklemede'}</button></td>
-              <td><button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {editingComment && (
+        <FormBox title={`Yorumu Düzenle`}>
+          <form onSubmit={handleUpdate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+            <div className="form-group"><label className="form-label">İsim</label><input value={editForm.isim} onChange={e => setEditForm({ ...editForm, isim: e.target.value })} /></div>
+            <div className="form-group"><label className="form-label">Soyisim</label><input value={editForm.soyisim} onChange={e => setEditForm({ ...editForm, soyisim: e.target.value })} /></div>
+            <div className="form-group"><label className="form-label">Plaka</label><input value={editForm.plaka} onChange={e => setEditForm({ ...editForm, plaka: e.target.value })} /></div>
+            <div className="form-group">
+              <label className="form-label">Puan</label>
+              <select value={editForm.rating} onChange={e => setEditForm({ ...editForm, rating: parseInt(e.target.value) })}>
+                {[1,2,3,4,5].map(n => <option key={n} value={n}>{n} Yıldız</option>)}
+              </select>
+            </div>
+            <div className="form-group" style={{ gridColumn: '2 / -1' }}><label className="form-label">Yorum</label><textarea rows={2} value={editForm.content} onChange={e => setEditForm({ ...editForm, content: e.target.value })} /></div>
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}>
+              <button type="submit" className="btn-red">Güncelle</button>
+              <button type="button" className="btn-gray" onClick={() => setEditingComment(null)}>İptal</button>
+            </div>
+          </form>
+        </FormBox>
+      )}
+
+      {/* ONAY BEKLEYENLER */}
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+          Onay Bekleyenler
+          <span style={{ background: '#E8000D', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 0 }}>{pending.length}</span>
+        </div>
+        <table>
+          {tableHead}
+          <tbody>
+            {pending.length === 0 && <tr><td colSpan={7} style={{ color: '#555', textAlign: 'center' }}>Onay bekleyen yorum yok.</td></tr>}
+            {pending.map(item => <CommentRow key={item.id} item={item} isPending={true} />)}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ONAYLANMIŞ YORUMLAR */}
+      <div>
+        <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+          Yayınlananlar
+          <span style={{ background: '#27AE60', color: '#fff', fontSize: 11, fontWeight: 700, padding: '2px 8px' }}>{approved.length}</span>
+        </div>
+        <table>
+          {tableHead}
+          <tbody>
+            {approved.length === 0 && <tr><td colSpan={7} style={{ color: '#555', textAlign: 'center' }}>Yayınlanan yorum yok.</td></tr>}
+            {approved.map(item => <CommentRow key={item.id} item={item} isPending={false} />)}
+          </tbody>
+        </table>
+      </div>
     </TabLayout>
   )
 }
