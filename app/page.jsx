@@ -359,15 +359,48 @@ function SectionHeader({ tag, title }) {
 }
 
 function CampaignCard({ campaign, active }) {
+  const [open, setOpen] = useState(false)
+
   return (
-    <div style={{ background: '#1A1A1A', border: '1px solid #333', borderTop: `3px solid ${active ? '#E8000D' : '#444'}`, padding: 20, opacity: active ? 1 : 0.7 }}>
-      <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{campaign.title}</div>
-      <div style={{ color: '#aaa', fontSize: 13, lineHeight: 1.6, marginBottom: 14 }}>{campaign.description}</div>
-      <div style={{ fontSize: 11, color: '#666', fontFamily: "'Inter'", letterSpacing: 0.5 }}>
-        <span style={{ color: '#E8000D', fontWeight: 600 }}>Başlangıç:</span> {new Date(campaign.start_at).toLocaleDateString('tr-TR')}
-        &nbsp;|&nbsp;
-        <span style={{ color: '#E8000D', fontWeight: 600 }}>Bitiş:</span> {new Date(campaign.end_at).toLocaleDateString('tr-TR')}
+    <div style={{ background: '#1A1A1A', border: '1px solid #333', borderTop: `3px solid ${active ? '#E8000D' : '#444'}`, opacity: active ? 1 : 0.8 }}>
+      {/* Kart Başlığı - tıklanabilir */}
+      <div onClick={() => setOpen(!open)} style={{ padding: 20, cursor: 'pointer', userSelect: 'none' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{campaign.title}</div>
+            <div style={{ color: '#aaa', fontSize: 13, lineHeight: 1.6, marginBottom: 14 }}>{campaign.description}</div>
+            <div style={{ fontSize: 11, color: '#666', fontFamily: "'Inter'", letterSpacing: 0.5 }}>
+              <span style={{ color: '#E8000D', fontWeight: 600 }}>Başlangıç:</span> {new Date(campaign.start_at).toLocaleDateString('tr-TR')}
+              &nbsp;|&nbsp;
+              <span style={{ color: '#E8000D', fontWeight: 600 }}>Bitiş:</span> {new Date(campaign.end_at).toLocaleDateString('tr-TR')}
+            </div>
+          </div>
+          <div style={{ color: '#E8000D', fontSize: 20, fontWeight: 300, flexShrink: 0, marginTop: 2 }}>
+            {open ? '−' : '+'}
+          </div>
+        </div>
       </div>
+
+      {/* Detaylar - açılır kapanır */}
+      {open && (
+        <div style={{ borderTop: '1px solid #2a2a2a', padding: 20 }}>
+          {campaign.details && (
+            <div style={{ color: '#ccc', fontSize: 14, lineHeight: 1.8, marginBottom: campaign.images?.length > 0 ? 20 : 0, whiteSpace: 'pre-wrap' }}>
+              {campaign.details}
+            </div>
+          )}
+          {!campaign.details && (!campaign.images || campaign.images.length === 0) && (
+            <div style={{ color: '#555', fontSize: 13 }}>Detay eklenmemiş.</div>
+          )}
+          {campaign.images && campaign.images.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
+              {campaign.images.map((url, i) => (
+                <img key={i} src={url} alt={`Kampanya görseli ${i + 1}`} style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', border: '1px solid #333', cursor: 'pointer' }} onClick={(e) => { e.stopPropagation(); window.open(url, '_blank') }} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

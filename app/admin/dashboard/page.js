@@ -113,7 +113,7 @@ export default function AdminDashboard() {
 /* ─── CAMPAIGNS ─── */
 function CampaignsTab() {
   const [items, setItems] = useState([])
-  const [form, setForm] = useState({ title: '', description: '', start_at: '', end_at: '' })
+  const [form, setForm] = useState({ title: '', description: '', details: '', start_at: '', end_at: '', images: [] })
   const [editing, setEditing] = useState(null)
   const [showForm, setShowForm] = useState(false)
 
@@ -133,7 +133,7 @@ function CampaignsTab() {
     setEditing(null); setShowForm(false); fetchItems()
   }
   const handleEdit = (item) => {
-    setForm({ title: item.title, description: item.description || '', start_at: item.start_at?.slice(0, 16) || '', end_at: item.end_at?.slice(0, 16) || '' })
+    setForm({ title: item.title, description: item.description || '', details: item.details || '', start_at: item.start_at?.slice(0, 16) || '', end_at: item.end_at?.slice(0, 16) || '', images: item.images || [] })
     setEditing(item.id); setShowForm(true)
   }
   const handleDelete = async (id) => {
@@ -159,8 +159,19 @@ function CampaignsTab() {
               <input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
             </div>
             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-              <label className="form-label">Açıklama</label>
+              <label className="form-label">Açıklama (Kart özeti)</label>
               <textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+            </div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <label className="form-label">Detaylar (Açılır kısım)</label>
+              <textarea rows={5} value={form.details || ''} onChange={e => setForm({ ...form, details: e.target.value })} placeholder="Kampanya detayları, koşullar, açıklamalar..." />
+            </div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <label className="form-label">Görseller</label>
+              <ImageUploader
+                images={form.images || []}
+                onChange={(images) => setForm({ ...form, images })}
+              />
             </div>
             <div className="form-group">
               <label className="form-label">Başlangıç Tarihi</label>
@@ -533,6 +544,55 @@ function FormBox({ title, children }) {
     <div style={{ background: '#111', border: '1px solid #222', borderTop: '3px solid #E8000D', padding: 24, marginBottom: 24 }}>
       <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: 2, color: '#aaa', textTransform: 'uppercase', marginBottom: 16 }}>{title}</div>
       {children}
+    </div>
+  )
+}
+
+function ImageUploader({ images, onChange }) {
+  const [uploading, setUploading] = useState(false)
+
+  const handleUpload = async (e) => {
+    const files = Array.from(e.target.files)
+    if (!files.length) return
+    setUploading(true)
+    const uploaded = []
+    for (const file of files) {
+      const ext = file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      const { data, error } = await supabase.storage
+        .from('campaign-images')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false })
+      if (!error) {
+        const { data: urlData } = supabase.storage.from('campaign-images').getPublicUrl(fileName)
+        uploaded.push(urlData.publicUrl)
+      }
+    }
+    onChange([...images, ...uploaded])
+    setUploading(false)
+  }
+
+  const handleRemove = async (url) => {
+    const fileName = url.split('/').pop()
+    await supabase.storage.from('campaign-images').remove([fileName])
+    onChange(images.filter(u => u !== url))
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {images.length > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 10 }}>
+          {images.map((url, i) => (
+            <div key={i} style={{ position: 'relative' }}>
+              <img src={url} alt="" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', border: '1px solid #333' }} />
+              <button onClick={() => handleRemove(url)} style={{ position: 'absolute', top: 4, right: 4, background: '#E8000D', border: 'none', color: '#fff', width: 22, height: 22, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+            </div>
+          ))}
+        </div>
+      )}
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#222', border: '1px dashed #444', color: '#aaa', padding: '10px 16px', cursor: 'pointer', fontFamily: "'Inter'", fontSize: 13 }}>
+        {uploading ? 'Yükleniyor...' : '+ Görsel Ekle'}
+        <input type="file" accept="image/*" multiple onChange={handleUpload} style={{ display: 'none' }} disabled={uploading} />
+      </label>
     </div>
   )
 }
