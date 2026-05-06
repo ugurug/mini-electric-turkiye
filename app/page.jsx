@@ -6,7 +6,6 @@ export default function Home() {
   const [campaigns, setCampaigns] = useState([])
   const [news, setNews] = useState([])
   const [faqs, setFaqs] = useState([])
-  const [issues, setIssues] = useState([])
   const [centers, setCenters] = useState([])
   const [comments, setComments] = useState([])
   const [openFaq, setOpenFaq] = useState(null)
@@ -22,14 +21,12 @@ export default function Home() {
         supabase.from('campaigns').select('*').order('created_at', { ascending: false }),
         supabase.from('news').select('*').order('created_at', { ascending: false }),
         supabase.from('faq').select('*').eq('enabled', true).order('display_order'),
-        supabase.from('known_issues').select('*').order('created_at', { ascending: false }),
         supabase.from('washing_centers').select('*').eq('approved', true),
         supabase.from('washing_comments').select('*').eq('approved', true),
       ])
       setCampaigns(c.data || [])
       setNews(n.data || [])
       setFaqs(f.data || [])
-      setIssues(i.data || [])
       setCenters(wc.data || [])
       setComments(wcom.data || [])
     }
@@ -58,9 +55,6 @@ export default function Home() {
       setCommentForm({ author_name: '', content: '', center_id: '', suggested_center_name: '' })
     }
   }
-
-  const statusLabel = (s) => ({ open: 'Açık', in_progress: 'İnceleniyor', resolved: 'Çözüldü' }[s] || s)
-  const statusColor = (s) => ({ open: '#E8000D', in_progress: '#F5A623', resolved: '#27AE60' }[s] || '#aaa')
 
   const formatDate = (d) => {
     const date = new Date(d)
@@ -139,7 +133,7 @@ export default function Home() {
 
           {/* Desktop Nav */}
           <div className="desktop-nav" style={{ display: 'flex' }}>
-            {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#sss','SSS'],['#sorunlar','Sorunlar'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
+            {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#sss','SSS'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
               <a key={href} href={href} className="nav-link">{label}</a>
             ))}
           </div>
@@ -154,7 +148,7 @@ export default function Home() {
 
         {/* Mobile Menu */}
         <div className={`mobile-menu${menuOpen ? ' open' : ''}`}>
-          {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#sss','SSS'],['#sorunlar','Sorunlar'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
+          {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#sss','SSS'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
             <a key={href} href={href} className="nav-link" onClick={() => setMenuOpen(false)}>{label}</a>
           ))}
         </div>
@@ -243,27 +237,6 @@ export default function Home() {
                   {openFaq === f.id && (
                     <div style={{ padding: '14px 18px', color: '#aaa', fontSize: 13, borderTop: '1px solid #222', background: '#111', lineHeight: 1.7 }}>{f.answer}</div>
                   )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* KNOWN ISSUES */}
-      <section id="sorunlar">
-        <div className="section-inner">
-          <SectionHeader tag="Takip" title="Bilinen Sorunlar" />
-          {issues.length === 0 ? <Empty text="Bilinen sorun bulunmuyor." /> : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {issues.map(i => (
-                <div key={i.id} className="issue-item">
-                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: statusColor(i.status), marginTop: 4, flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: "'Montserrat'", fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{i.title}</div>
-                    <div style={{ color: '#aaa', fontSize: 13, lineHeight: 1.5 }}>{i.description}</div>
-                  </div>
-                  <div className="issue-status" style={{ fontFamily: "'Inter'", fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', padding: '3px 8px', fontWeight: 600, flexShrink: 0, color: statusColor(i.status), border: `1px solid ${statusColor(i.status)}`, marginLeft: 'auto' }}>{statusLabel(i.status)}</div>
                 </div>
               ))}
             </div>

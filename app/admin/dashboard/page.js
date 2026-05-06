@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 
-const TABS = ['Kampanyalar', 'Haberler', 'SSS', 'Bilinen Sorunlar', 'Yıkama Merkezleri', 'Yıkama Yorumları', 'Kullanıcılar']
+const TABS = ['Kampanyalar', 'Haberler', 'SSS', 'Yıkama Merkezleri', 'Yıkama Yorumları', 'Kullanıcılar']
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -101,10 +101,9 @@ export default function AdminDashboard() {
         {activeTab === 0 && <CampaignsTab />}
         {activeTab === 1 && <NewsTab />}
         {activeTab === 2 && <FaqTab />}
-        {activeTab === 3 && <IssuesTab />}
-        {activeTab === 4 && <CentersTab />}
-        {activeTab === 5 && <CommentsTab />}
-        {activeTab === 6 && role === 'super_admin' && <UsersTab />}
+        {activeTab === 3 && <CentersTab />}
+        {activeTab === 4 && <CommentsTab />}
+        {activeTab === 5 && role === 'super_admin' && <UsersTab />}
       </div>
     </div>
   )
@@ -311,64 +310,6 @@ function FaqTab() {
               <td style={{ maxWidth: 260 }}>{item.answer?.slice(0, 60)}...</td>
               <td>{item.display_order}</td>
               <td><button onClick={() => toggleEnabled(item)} className="badge" style={{ color: item.enabled ? '#27AE60' : '#555', border: `1px solid ${item.enabled ? '#27AE60' : '#555'}`, background: 'none', cursor: 'pointer' }}>{item.enabled ? 'Aktif' : 'Pasif'}</button></td>
-              <td><div style={{ display: 'flex', gap: 8 }}><button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button><button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button></div></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </TabLayout>
-  )
-}
-
-/* ─── KNOWN ISSUES ─── */
-function IssuesTab() {
-  const [items, setItems] = useState([])
-  const [form, setForm] = useState({ title: '', description: '', status: 'open' })
-  const [editing, setEditing] = useState(null)
-  const [showForm, setShowForm] = useState(false)
-
-  useEffect(() => { fetchItems() }, [])
-  const fetchItems = async () => {
-    const { data } = await supabase.from('known_issues').select('*').order('created_at', { ascending: false })
-    setItems(data || [])
-  }
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (editing) { await supabase.from('known_issues').update(form).eq('id', editing) }
-    else { await supabase.from('known_issues').insert([form]) }
-    setForm({ title: '', description: '', status: 'open' }); setEditing(null); setShowForm(false); fetchItems()
-  }
-  const handleEdit = (item) => { setForm({ title: item.title, description: item.description || '', status: item.status }); setEditing(item.id); setShowForm(true) }
-  const handleDelete = async (id) => { if (confirm('Bu sorunu silmek istiyor musunuz?')) { await supabase.from('known_issues').delete().eq('id', id); fetchItems() } }
-
-  const statusLabel = (s) => ({ open: 'Açık', in_progress: 'İnceleniyor', resolved: 'Çözüldü' }[s])
-  const statusColor = (s) => ({ open: '#E8000D', in_progress: '#F5A623', resolved: '#27AE60' }[s])
-
-  return (
-    <TabLayout title="Bilinen Sorunlar" onAdd={() => { setForm({ title: '', description: '', status: 'open' }); setEditing(null); setShowForm(!showForm) }}>
-      {showForm && (
-        <FormBox title={editing ? 'Sorunu Düzenle' : 'Yeni Sorun'}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div className="form-group"><label className="form-label">Başlık</label><input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></div>
-            <div className="form-group"><label className="form-label">Açıklama</label><textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
-            <div className="form-group"><label className="form-label">Durum</label>
-              <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
-                <option value="open">Açık</option><option value="in_progress">İnceleniyor</option><option value="resolved">Çözüldü</option>
-              </select>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}><button type="submit" className="btn-red">{editing ? 'Güncelle' : 'Kaydet'}</button><button type="button" className="btn-gray" onClick={() => { setShowForm(false); setEditing(null) }}>İptal</button></div>
-          </form>
-        </FormBox>
-      )}
-      <table>
-        <thead><tr><th>Başlık</th><th>Açıklama</th><th>Durum</th><th>İşlemler</th></tr></thead>
-        <tbody>
-          {items.length === 0 && <tr><td colSpan={4} style={{ color: '#555', textAlign: 'center' }}>Henüz sorun yok.</td></tr>}
-          {items.map(item => (
-            <tr key={item.id}>
-              <td style={{ color: '#fff', fontWeight: 600 }}>{item.title}</td>
-              <td style={{ maxWidth: 300 }}>{item.description}</td>
-              <td><span className="badge" style={{ color: statusColor(item.status), border: `1px solid ${statusColor(item.status)}` }}>{statusLabel(item.status)}</span></td>
               <td><div style={{ display: 'flex', gap: 8 }}><button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button><button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button></div></td>
             </tr>
           ))}
