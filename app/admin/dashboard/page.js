@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { iller } from '../../lib/iller'
 
+
 const TABS = ['Kampanyalar', 'Haberler', 'SSS', 'Yıkama Merkezleri', 'Yıkama Yorumları', 'Kullanıcılar']
 
 export default function AdminDashboard() {
@@ -805,4 +806,8 @@ function ImageUploader({ images, onChange }) {
       </label>
     </div>
   )
+}
+
+function Empty({ text }) {
+  return <div style={{ color: '#555', fontSize: 13, fontFamily: "'Inter'", padding: '20px 0' }}>{text}</div>
 }
