@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase'
+import { iller } from './lib/iller'
 
 export default function Home() {
   const [campaigns, setCampaigns] = useState([])
