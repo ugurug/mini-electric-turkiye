@@ -14,6 +14,8 @@ export default function Home() {
   const [showFinalized, setShowFinalized] = useState(false)
   const [filterIl, setFilterIl] = useState('')
   const [filterIlce, setFilterIlce] = useState('')
+  const [openCenterComments, setOpenCenterComments] = useState({})
+  const [showCommentForm, setShowCommentForm] = useState(false)
   const [commentForm, setCommentForm] = useState({ isim: '', soyisim: '', plaka: '', content: '', center_id: '', il: '', ilce: '', rating: 0 })
   const [commentSubmitted, setCommentSubmitted] = useState(false)
 
@@ -60,7 +62,6 @@ export default function Home() {
     return { day: date.getDate(), month: date.toLocaleString('tr-TR', { month: 'short' }) }
   }
 
-  // Yıkama merkezi puanlama
   const centerStats = (centerId) => {
     const cc = comments.filter(c => c.center_id === centerId)
     if (cc.length === 0) return null
@@ -82,6 +83,10 @@ export default function Home() {
 
   const displayedCenters = (filterIl || filterIlce) ? filteredCenters : rankedCenters.slice(0, 5)
 
+  const toggleCenterComments = (id) => {
+    setOpenCenterComments(prev => ({ ...prev, [id]: !prev[id] }))
+  }
+
   return (
     <div style={{ background: '#0A0A0A', color: '#fff', fontFamily: "'Inter', sans-serif", minHeight: '100vh' }}>
       <style>{`
@@ -92,6 +97,8 @@ export default function Home() {
         .nav-link:hover { color: #E8000D; }
         .btn-red { display: inline-block; background: #E8000D; color: #fff; font-family: 'Inter', sans-serif; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; padding: 14px 32px; text-decoration: none; border: none; cursor: pointer; transition: background 0.2s; }
         .btn-red:hover { background: #c00; }
+        .btn-ghost { display: inline-block; background: none; color: #aaa; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 8px 16px; border: 1px solid #333; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
+        .btn-ghost:hover { border-color: #E8000D; color: #E8000D; }
         input, textarea, select { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 13px; width: 100%; outline: none; border-radius: 0; }
         input:focus, textarea:focus, select:focus { border-color: #E8000D; }
         select option { background: #1a1a1a; }
@@ -180,7 +187,7 @@ export default function Home() {
               <div style={{ fontFamily: "'Inter'", fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', color: '#555', fontWeight: 700, border: '1px solid #333', padding: '3px 8px', flexShrink: 0 }}>Arşiv</div>
               <div style={{ fontFamily: "'Montserrat'", fontSize: 26, fontWeight: 900, letterSpacing: 1 }}>Geçmiş Kampanyalar</div>
               <div style={{ flex: 1, height: 1, background: '#222', minWidth: 20 }} />
-              <button onClick={() => setShowFinalized(!showFinalized)} style={{ background: 'none', border: '1px solid #333', color: '#aaa', fontFamily: "'Inter'", fontSize: 12, fontWeight: 600, padding: '6px 14px', cursor: 'pointer', transition: 'all 0.2s', flexShrink: 0 }}>
+              <button onClick={() => setShowFinalized(!showFinalized)} className="btn-ghost">
                 {showFinalized ? '▲ Gizle' : '▼ Göster'}
               </button>
             </div>
@@ -260,7 +267,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ fontSize: 12, color: '#555', fontFamily: "'Inter'", marginBottom: 16 }}>
+          <div style={{ fontSize: 12, color: '#555', marginBottom: 16 }}>
             {!filterIl
               ? 'Türkiye genelinde en yüksek puanlı 5 merkez gösteriliyor.'
               : <><span style={{ color: '#E8000D', fontWeight: 600 }}>{filterIl}{filterIlce ? ` / ${filterIlce}` : ''}</span> bölgesinde {filteredCenters.length} merkez bulundu.</>
@@ -269,108 +276,132 @@ export default function Home() {
 
           {displayedCenters.length === 0
             ? <Empty text="Bu bölgede henüz yorumlanmış yıkama merkezi bulunmuyor." />
-            : displayedCenters.map((center, index) => (
-              <div key={center.id} style={{ background: '#1A1A1A', border: '1px solid #2a2a2a', marginBottom: 16 }}>
-                <div style={{ padding: '14px 20px', borderBottom: '1px solid #222', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 32, height: 32, background: '#E8000D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Montserrat'", fontWeight: 900, fontSize: 14, color: '#fff', flexShrink: 0 }}>
-                    {index + 1}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: "'Montserrat'", fontSize: 15, fontWeight: 700, color: '#fff' }}>{center.name}</div>
-                    <div style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>{center.il} / {center.ilce}</div>
-                  </div>
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ color: '#F5A623', fontSize: 16 }}>
-                      {'★'.repeat(Math.round(center.stats.avg))}{'☆'.repeat(5 - Math.round(center.stats.avg))}
+            : displayedCenters.map((center, index) => {
+              const centerComments = comments.filter(c => c.center_id === center.id)
+              const isOpen = openCenterComments[center.id]
+              return (
+                <div key={center.id} style={{ background: '#1A1A1A', border: '1px solid #2a2a2a', marginBottom: 12 }}>
+                  {/* MERKEZ BAŞLIĞI */}
+                  <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ width: 32, height: 32, background: '#E8000D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Montserrat'", fontWeight: 900, fontSize: 14, color: '#fff', flexShrink: 0 }}>
+                      {index + 1}
                     </div>
-                    <div style={{ fontSize: 11, color: '#aaa', marginTop: 2 }}>
-                      <span style={{ color: '#fff', fontWeight: 700 }}>{center.stats.avg}</span> / 5 · {center.stats.count} yorum
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: "'Montserrat'", fontSize: 15, fontWeight: 700, color: '#fff' }}>{center.name}</div>
+                      <div style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>{center.il} / {center.ilce}</div>
                     </div>
-                  </div>
-                </div>
-                <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {comments.filter(c => c.center_id === center.id).map(c => (
-                    <div key={c.id} style={{ borderLeft: '3px solid #8B0000', paddingLeft: 12 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
-                        <div style={{ fontSize: 12, color: '#E8000D', fontWeight: 700, fontFamily: "'Montserrat'" }}>{c.isim} {c.soyisim}</div>
-                        {c.plaka && <div style={{ fontSize: 11, color: '#555', background: '#222', padding: '2px 6px' }}>{c.plaka}</div>}
-                        {c.rating && <div style={{ color: '#F5A623', fontSize: 12 }}>{'★'.repeat(c.rating)}{'☆'.repeat(5 - c.rating)}</div>}
+                    <div style={{ textAlign: 'right', flexShrink: 0, marginRight: 12 }}>
+                      <div style={{ color: '#F5A623', fontSize: 15 }}>
+                        {'★'.repeat(Math.round(center.stats.avg))}{'☆'.repeat(5 - Math.round(center.stats.avg))}
                       </div>
-                      <div style={{ fontSize: 13, color: '#aaa', lineHeight: 1.5 }}>{c.content}</div>
+                      <div style={{ fontSize: 11, color: '#aaa', marginTop: 2 }}>
+                        <span style={{ color: '#fff', fontWeight: 700 }}>{center.stats.avg}</span> / 5 · {center.stats.count} yorum
+                      </div>
                     </div>
-                  ))}
+                    {/* YORUMLARI AÇ/KAPAT */}
+                    <button onClick={() => toggleCenterComments(center.id)} className="btn-ghost" style={{ flexShrink: 0, fontSize: 11, padding: '6px 12px' }}>
+                      {isOpen ? '▲ Gizle' : '▼ Yorumlar'}
+                    </button>
+                  </div>
+
+                  {/* YORUMLAR - gizli başlar */}
+                  {isOpen && (
+                    <div style={{ borderTop: '1px solid #222', padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {centerComments.length === 0
+                        ? <div style={{ color: '#555', fontSize: 13 }}>Henüz yorum yok.</div>
+                        : centerComments.map(c => (
+                          <div key={c.id} style={{ borderLeft: '3px solid #8B0000', paddingLeft: 12 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+                              {c.rating && <div style={{ color: '#F5A623', fontSize: 12 }}>{'★'.repeat(c.rating)}{'☆'.repeat(5 - c.rating)}</div>}
+                              <div style={{ fontSize: 11, color: '#555' }}>{new Date(c.created_at).toLocaleDateString('tr-TR')}</div>
+                            </div>
+                            <div style={{ fontSize: 13, color: '#aaa', lineHeight: 1.5 }}>{c.content}</div>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))
+              )
+            })
           }
 
-          {/* YORUM FORMU */}
-          <div style={{ background: '#111', border: '1px solid #222', borderTop: '3px solid #E8000D', padding: '24px 20px', marginTop: 8 }}>
-            <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>Yorum Ekle</div>
-            {commentSubmitted ? (
-              <div style={{ color: '#27AE60', fontFamily: "'Montserrat'", fontSize: 14, fontWeight: 600 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
-            ) : (
-              <form onSubmit={handleCommentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div className="filter-grid">
-                  <div>
-                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İl</div>
-                    <select required value={commentForm.il} onChange={e => setCommentForm({ ...commentForm, il: e.target.value, ilce: '', center_id: '' })}>
-                      <option value="">İl seçin...</option>
-                      {iller.map(i => <option key={i.il} value={i.il}>{i.il}</option>)}
-                    </select>
+          {/* YORUM EKLE BUTONU */}
+          <div style={{ marginTop: 20 }}>
+            <button onClick={() => setShowCommentForm(!showCommentForm)} className="btn-ghost" style={{ width: '100%', padding: '12px', fontSize: 13, textAlign: 'center' }}>
+              {showCommentForm ? '▲ Formu Kapat' : '+ Yorum Ekle'}
+            </button>
+          </div>
+
+          {/* YORUM FORMU - gizli başlar */}
+          {showCommentForm && (
+            <div style={{ background: '#111', border: '1px solid #222', borderTop: '3px solid #E8000D', padding: '24px 20px', marginTop: 12 }}>
+              <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>Yorum Ekle</div>
+              {commentSubmitted ? (
+                <div style={{ color: '#27AE60', fontFamily: "'Montserrat'", fontSize: 14, fontWeight: 600 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
+              ) : (
+                <form onSubmit={handleCommentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <div className="filter-grid">
+                    <div>
+                      <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İl</div>
+                      <select required value={commentForm.il} onChange={e => setCommentForm({ ...commentForm, il: e.target.value, ilce: '', center_id: '' })}>
+                        <option value="">İl seçin...</option>
+                        {iller.map(i => <option key={i.il} value={i.il}>{i.il}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İlçe</div>
+                      <select required value={commentForm.ilce} onChange={e => setCommentForm({ ...commentForm, ilce: e.target.value, center_id: '' })} disabled={!commentForm.il}>
+                        <option value="">İlçe seçin...</option>
+                        {(iller.find(i => i.il === commentForm.il)?.ilceler || []).map(ilce => (
+                          <option key={ilce} value={ilce}>{ilce}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İlçe</div>
-                    <select required value={commentForm.ilce} onChange={e => setCommentForm({ ...commentForm, ilce: e.target.value, center_id: '' })} disabled={!commentForm.il}>
-                      <option value="">İlçe seçin...</option>
-                      {(iller.find(i => i.il === commentForm.il)?.ilceler || []).map(ilce => (
-                        <option key={ilce} value={ilce}>{ilce}</option>
+                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Yıkama Merkezi</div>
+                    <select required value={commentForm.center_id} onChange={e => setCommentForm({ ...commentForm, center_id: e.target.value })} disabled={!commentForm.ilce}>
+                      <option value="">Merkez seçin...</option>
+                      {centers.filter(c => c.il === commentForm.il && c.ilce === commentForm.ilce).map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
                     </select>
                   </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Yıkama Merkezi</div>
-                  <select required value={commentForm.center_id} onChange={e => setCommentForm({ ...commentForm, center_id: e.target.value })} disabled={!commentForm.ilce}>
-                    <option value="">Merkez seçin...</option>
-                    {centers.filter(c => c.il === commentForm.il && c.ilce === commentForm.ilce).map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-grid-3">
-                  <div>
-                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İsim</div>
-                    <input required placeholder="İsim" value={commentForm.isim} onChange={e => setCommentForm({ ...commentForm, isim: e.target.value })} />
+                  <div className="form-grid-3">
+                    <div>
+                      <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>İsim</div>
+                      <input required placeholder="İsim" value={commentForm.isim} onChange={e => setCommentForm({ ...commentForm, isim: e.target.value })} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Soyisim</div>
+                      <input required placeholder="Soyisim" value={commentForm.soyisim} onChange={e => setCommentForm({ ...commentForm, soyisim: e.target.value })} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Araç Plakası</div>
+                      <input required placeholder="34 ABC 123" value={commentForm.plaka} onChange={e => setCommentForm({ ...commentForm, plaka: e.target.value.toUpperCase() })} />
+                    </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Soyisim</div>
-                    <input required placeholder="Soyisim" value={commentForm.soyisim} onChange={e => setCommentForm({ ...commentForm, soyisim: e.target.value })} />
+                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Puanınız</div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      {[1,2,3,4,5].map(n => (
+                        <button key={n} type="button" onClick={() => setCommentForm({ ...commentForm, rating: n })}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 28, color: n <= (commentForm.rating || 0) ? '#F5A623' : '#444', padding: 0, lineHeight: 1, transition: 'color 0.15s' }}>
+                          ★
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Araç Plakası</div>
-                    <input required placeholder="34 ABC 123" value={commentForm.plaka} onChange={e => setCommentForm({ ...commentForm, plaka: e.target.value.toUpperCase() })} />
+                    <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Yorumunuz</div>
+                    <textarea placeholder="Deneyiminizi paylaşın..." rows={3} required value={commentForm.content} onChange={e => setCommentForm({ ...commentForm, content: e.target.value })} />
                   </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>Puanınız</div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    {[1,2,3,4,5].map(n => (
-                      <button key={n} type="button" onClick={() => setCommentForm({ ...commentForm, rating: n })}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 28, color: n <= (commentForm.rating || 0) ? '#F5A623' : '#444', padding: 0, lineHeight: 1, transition: 'color 0.15s' }}>
-                        ★
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Yorumunuz</div>
-                  <textarea placeholder="Deneyiminizi paylaşın..." rows={3} required value={commentForm.content} onChange={e => setCommentForm({ ...commentForm, content: e.target.value })} />
-                </div>
-                <button type="submit" className="btn-red" style={{ alignSelf: 'flex-start' }}>Gönder</button>
-              </form>
-            )}
-          </div>
+                  <button type="submit" className="btn-red" style={{ alignSelf: 'flex-start' }}>Gönder</button>
+                </form>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
