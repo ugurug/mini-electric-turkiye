@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "MINI Electric Türkiye",
   description: "Türkiye'nin en büyük elektrikli MINI topluluğu",
   icons: {
-    icon: './public/logo.png',
+    icon: '/favicon.ico',
   },
 };
 
