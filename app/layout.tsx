@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MINI Electric Türkiye",
   description: "Türkiye'nin en büyük elektrikli MINI topluluğu",
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({
