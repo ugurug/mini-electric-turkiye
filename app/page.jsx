@@ -328,7 +328,7 @@ export default function Home() {
 
           {/* YORUM EKLE BUTONU */}
           <div style={{ marginTop: 20 }}>
-            <button onClick={() => setShowCommentForm(!showCommentForm)} className="btn-ghost" style={{ width: '100%', padding: '12px', fontSize: 13, textAlign: 'center' }}>
+            <button onClick={() => { setShowCommentForm(!showCommentForm); setCommentSubmitted(false) }} className="btn-ghost" style={{ width: '100%', padding: '12px', fontSize: 13, textAlign: 'center' }}>
               {showCommentForm ? '▲ Formu Kapat' : '+ Yorum Ekle'}
             </button>
           </div>
@@ -338,7 +338,10 @@ export default function Home() {
             <div style={{ background: '#111', border: '1px solid #222', borderTop: '3px solid #E8000D', padding: '24px 20px', marginTop: 12 }}>
               <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, marginBottom: 20, textTransform: 'uppercase' }}>Yorum Ekle</div>
               {commentSubmitted ? (
-                <div style={{ color: '#27AE60', fontFamily: "'Montserrat'", fontSize: 14, fontWeight: 600 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
+                <div>
+                  <div style={{ color: '#27AE60', fontFamily: "'Montserrat'", fontSize: 14, fontWeight: 600, marginBottom: 16 }}>✓ Yorumunuz alındı. Admin onayından sonra yayınlanacak.</div>
+                  <button onClick={() => setCommentSubmitted(false)} className="btn-ghost">+ Yeni Yorum Ekle</button>
+                </div>
               ) : (
                 <form onSubmit={handleCommentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div className="filter-grid">
