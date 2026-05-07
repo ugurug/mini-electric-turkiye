@@ -16,7 +16,7 @@ export default function Home() {
   const [filterIlce, setFilterIlce] = useState('')
   const [openCenterComments, setOpenCenterComments] = useState({})
   const [showCommentForm, setShowCommentForm] = useState(false)
-  const [commentForm, setCommentForm] = useState({ isim: '', soyisim: '', plaka: '', content: '', center_id: '', il: '', ilce: '', rating: 0 })
+  const [commentForm, setCommentForm] = useState({ isim: '', soyisim: '', plaka: '', content: '', center_id: '', il: '', ilce: '', rating: 0, new_center_name: '', is_new_center: false })
   const [commentSubmitted, setCommentSubmitted] = useState(false)
 
   useEffect(() => {
@@ -41,19 +41,31 @@ export default function Home() {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault()
-    const payload = {
+    let centerId = commentForm.center_id
+
+    if (commentForm.is_new_center) {
+      // Yeni merkezi onaysız olarak ekle
+      const { data: newCenter, error: centerError } = await supabase
+        .from('washing_centers')
+        .insert([{ name: commentForm.new_center_name, il: commentForm.il, ilce: commentForm.ilce, approved: false }])
+        .select()
+        .single()
+      if (centerError) return
+      centerId = newCenter.id
+    }
+
+    const { error } = await supabase.from('washing_comments').insert([{
       isim: commentForm.isim,
       soyisim: commentForm.soyisim,
       plaka: commentForm.plaka,
       content: commentForm.content,
-      center_id: commentForm.center_id,
+      center_id: centerId,
       rating: commentForm.rating,
       approved: false,
-    }
-    const { error } = await supabase.from('washing_comments').insert([payload])
+    }])
     if (!error) {
       setCommentSubmitted(true)
-      setCommentForm({ isim: '', soyisim: '', plaka: '', content: '', center_id: '', il: '', ilce: '', rating: 0 })
+      setCommentForm({ isim: '', soyisim: '', plaka: '', content: '', center_id: '', il: '', ilce: '', rating: 0, new_center_name: '', is_new_center: false })
     }
   }
 
@@ -364,12 +376,33 @@ export default function Home() {
                   </div>
                   <div>
                     <div style={{ fontSize: 11, color: '#aaa', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>Yıkama Merkezi</div>
-                    <select required value={commentForm.center_id} onChange={e => setCommentForm({ ...commentForm, center_id: e.target.value })} disabled={!commentForm.ilce}>
+                    <select
+                      required={!commentForm.is_new_center}
+                      value={commentForm.is_new_center ? 'NEW' : commentForm.center_id}
+                      onChange={e => {
+                        if (e.target.value === 'NEW') {
+                          setCommentForm({ ...commentForm, is_new_center: true, center_id: '', new_center_name: '' })
+                        } else {
+                          setCommentForm({ ...commentForm, is_new_center: false, center_id: e.target.value, new_center_name: '' })
+                        }
+                      }}
+                      disabled={!commentForm.ilce}
+                    >
                       <option value="">Merkez seçin...</option>
                       {centers.filter(c => c.il === commentForm.il && c.ilce === commentForm.ilce).map(c => (
                         <option key={c.id} value={c.id}>{c.name}</option>
                       ))}
+                      <option value="NEW">+ Yeni Yıkama Merkezi Ekle</option>
                     </select>
+                    {commentForm.is_new_center && (
+                      <input
+                        required
+                        placeholder="Yıkama merkezi adını girin..."
+                        value={commentForm.new_center_name}
+                        onChange={e => setCommentForm({ ...commentForm, new_center_name: e.target.value })}
+                        style={{ marginTop: 8 }}
+                      />
+                    )}
                   </div>
                   <div className="form-grid-3">
                     <div>

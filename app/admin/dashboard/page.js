@@ -449,7 +449,12 @@ function CommentsTab() {
   }
 
   const toggleApprove = async (item) => {
-    await supabase.from('washing_comments').update({ approved: !item.approved }).eq('id', item.id)
+    const newApproved = !item.approved
+    await supabase.from('washing_comments').update({ approved: newApproved }).eq('id', item.id)
+    // Yorum onaylanıyorsa merkezi de onayla
+    if (newApproved && item.center_id) {
+      await supabase.from('washing_centers').update({ approved: true }).eq('id', item.center_id)
+    }
     fetchAll()
   }
 
