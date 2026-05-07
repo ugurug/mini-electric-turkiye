@@ -17,18 +17,17 @@ export default function Home() {
 
   useEffect(() => {
     const fetchAll = async () => {
-      const [c, n, f, i, wc, wcom] = await Promise.all([
-        supabase.from('campaigns').select('*').order('created_at', { ascending: false }),
-        supabase.from('news').select('*').order('created_at', { ascending: false }),
-        supabase.from('faq').select('*').eq('enabled', true).order('display_order'),
-        supabase.from('washing_centers').select('*').eq('approved', true),
-        supabase.from('washing_comments').select('*').eq('approved', true),
-      ])
-      setCampaigns(c.data || [])
-      setNews(n.data || [])
-      setFaqs(f.data || [])
-      setCenters(wc.data || [])
-      setComments(wcom.data || [])
+      const cResult = await supabase.from('campaigns').select('*').order('created_at', { ascending: false })
+      const nResult = await supabase.from('news').select('*').order('created_at', { ascending: false })
+      const fResult = await supabase.from('faq').select('*').eq('enabled', true).order('display_order')
+      const wcResult = await supabase.from('washing_centers').select('*').eq('approved', true)
+      const wcomResult = await supabase.from('washing_comments').select('*').eq('approved', true)
+
+      setCampaigns(cResult.data || [])
+      setNews(nResult.data || [])
+      setFaqs(fResult.data || [])
+      setCenters(wcResult.data || [])
+      setComments(wcomResult.data || [])
     }
     fetchAll()
   }, [])
