@@ -11,6 +11,7 @@ export default function Home() {
   const [comments, setComments] = useState([])
   const [openFaq, setOpenFaq] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [view, setView] = useState('main') // 'main' | 'sss'
   const [showFinalized, setShowFinalized] = useState(false)
   const [filterIl, setFilterIl] = useState('')
   const [filterIlce, setFilterIlce] = useState('')
@@ -150,9 +151,10 @@ export default function Home() {
             </span>
           </a>
           <div className="desktop-nav" style={{ display: 'flex' }}>
-            {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#sss','SSS'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
-              <a key={href} href={href} className="nav-link">{label}</a>
+            {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
+              <a key={href} href={href} className="nav-link" onClick={() => setView('main')}>{label}</a>
             ))}
+            <button onClick={() => { setView(view === 'sss' ? 'main' : 'sss'); setMenuOpen(false) }} className="nav-link" style={{ background: view === 'sss' ? '#E8000D' : 'none', color: view === 'sss' ? '#fff' : '#aaa', border: 'none', cursor: 'pointer' }}>SSS</button>
           </div>
           <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menü">
             <span style={{ transform: menuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
@@ -161,12 +163,14 @@ export default function Home() {
           </button>
         </div>
         <div className={`mobile-menu${menuOpen ? ' open' : ''}`}>
-          {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#sss','SSS'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
-            <a key={href} href={href} className="nav-link" onClick={() => setMenuOpen(false)}>{label}</a>
+          {[['#kampanyalar','Kampanyalar'],['#haberler','Haberler'],['#yikama','Yıkama'],['#kulup','Kulüp']].map(([href, label]) => (
+            <a key={href} href={href} className="nav-link" onClick={() => { setMenuOpen(false); setView('main') }}>{label}</a>
           ))}
+          <button onClick={() => { setView(view === 'sss' ? 'main' : 'sss'); setMenuOpen(false) }} className="nav-link" style={{ background: view === 'sss' ? '#E8000D' : 'none', color: view === 'sss' ? '#fff' : '#aaa', border: 'none', cursor: 'pointer', textAlign: 'left', width: '100%' }}>SSS</button>
         </div>
       </nav>
 
+      {view === 'main' && <>
       {/* HERO */}
       <div style={{ background: '#111', borderBottom: '1px solid #222', padding: '52px 20px 44px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(139,0,0,0.04) 40px, rgba(139,0,0,0.04) 80px)', pointerEvents: 'none' }} />
@@ -229,16 +233,6 @@ export default function Home() {
               </div>
             )
           })}
-        </div>
-      </section>
-
-      {/* SSS */}
-      <section id="sss">
-        <div className="section-inner">
-          <SectionHeader tag="Bilgi" title="Sık Sorulan Sorular" />
-          {faqs.length === 0 ? <Empty text="Henüz SSS eklenmedi." /> : (
-            <FaqSection faqs={faqs} openFaq={openFaq} setOpenFaq={setOpenFaq} />
-          )}
         </div>
       </section>
 
@@ -443,6 +437,17 @@ export default function Home() {
           © 2026 <span style={{ color: '#E8000D', fontFamily: "'Montserrat'", fontWeight: 700 }}>Mini Electric Türkiye</span> Fan Kulübü — Tüm hakları saklıdır.
         </div>
       </footer>
+      </>}
+      {/* SSS */}
+      {/* SSS VIEW */}
+      {view === 'sss' && (
+        <div style={{ maxWidth: 960, margin: '0 auto', padding: '48px 20px' }}>
+          <SectionHeader tag="Bilgi" title="Sık Sorulan Sorular" />
+          {faqs.length === 0 ? <Empty text="Henüz SSS eklenmedi." /> : (
+            <FaqSection faqs={faqs} openFaq={openFaq} setOpenFaq={setOpenFaq} />
+          )}
+        </div>
+      )}
     </div>
   )
 }
