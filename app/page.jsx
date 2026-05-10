@@ -85,7 +85,7 @@ export default function Home() {
   const rankedCenters = centers
     .map(c => ({ ...c, stats: centerStats(c.id) }))
     .filter(c => c.stats !== null)
-    .sort((a, b) => b.stats.avg - a.stats.avg)
+    .sort((a, b) => b.stats.avg - a.stats.avg || b.stats.count - a.stats.count)
 
   const filteredCenters = rankedCenters.filter(c => {
     if (filterIl && filterIlce) return c.il === filterIl && c.ilce === filterIlce
