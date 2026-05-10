@@ -237,19 +237,7 @@ export default function Home() {
         <div className="section-inner">
           <SectionHeader tag="Bilgi" title="Sık Sorulan Sorular" />
           {faqs.length === 0 ? <Empty text="Henüz SSS eklenmedi." /> : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {faqs.map(f => (
-                <div key={f.id} style={{ border: '1px solid #222' }}>
-                  <div className="faq-q" onClick={() => setOpenFaq(openFaq === f.id ? null : f.id)}>
-                    <span>{f.question}</span>
-                    <span style={{ color: '#E8000D', fontSize: 22, fontWeight: 300, flexShrink: 0 }}>{openFaq === f.id ? '−' : '+'}</span>
-                  </div>
-                  {openFaq === f.id && (
-                    <div style={{ padding: '14px 18px', color: '#aaa', fontSize: 13, borderTop: '1px solid #222', background: '#111', lineHeight: 1.7 }}>{f.answer}</div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <FaqSection faqs={faqs} openFaq={openFaq} setOpenFaq={setOpenFaq} />
           )}
         </div>
       </section>
@@ -527,4 +515,92 @@ function RenderText({ text }) {
 
 function Empty({ text }) {
   return <div style={{ color: '#555', fontSize: 13, fontFamily: "'Inter'", padding: '20px 0' }}>{text}</div>
+}
+
+function FaqSection({ faqs, openFaq, setOpenFaq }) {
+  const [search, setSearch] = useState('')
+  const [activeCategory, setActiveCategory] = useState('Tümü')
+
+  const categories = ['Tümü', ...Array.from(new Set(faqs.map(f => f.category || 'Genel'))).sort()]
+
+  const filtered = faqs.filter(f => {
+    const matchCat = activeCategory === 'Tümü' || (f.category || 'Genel') === activeCategory
+    const matchSearch = search === '' ||
+      f.question.toLowerCase().includes(search.toLowerCase()) ||
+      f.answer.toLowerCase().includes(search.toLowerCase())
+    return matchCat && matchSearch
+  })
+
+  const grouped = filtered.reduce((acc, f) => {
+    const cat = f.category || 'Genel'
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(f)
+    return acc
+  }, {})
+
+  return (
+    <div>
+      {/* ARAMA */}
+      <div style={{ position: 'relative', marginBottom: 20 }}>
+        <input
+          placeholder="Soru ara..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ paddingLeft: 40 }}
+        />
+        <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#555', fontSize: 15 }}>🔍</span>
+        {search && (
+          <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#555', cursor: 'pointer', fontSize: 18, lineHeight: 1 }}>×</button>
+        )}
+      </div>
+
+      {/* KATEGORİ FİLTRELERİ */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+        {categories.map(cat => (
+          <button key={cat} onClick={() => setActiveCategory(cat)} style={{
+            background: activeCategory === cat ? '#E8000D' : 'none',
+            border: `1px solid ${activeCategory === cat ? '#E8000D' : '#333'}`,
+            color: activeCategory === cat ? '#fff' : '#aaa',
+            fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 600,
+            padding: '5px 12px', cursor: 'pointer', letterSpacing: 0.5,
+            transition: 'all 0.2s'
+          }}>{cat}</button>
+        ))}
+      </div>
+
+      {/* SONUÇLAR */}
+      {filtered.length === 0 ? (
+        <Empty text="Aramanızla eşleşen soru bulunamadı." />
+      ) : activeCategory === 'Tümü' && search === '' ? (
+        // Kategorili görünüm
+        Object.entries(grouped).map(([cat, items]) => (
+          <div key={cat} style={{ marginBottom: 28 }}>
+            <div style={{ fontFamily: "'Montserrat'", fontSize: 13, fontWeight: 800, color: '#E8000D', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10, paddingBottom: 8, borderBottom: '1px solid #1f1f1f' }}>{cat}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {items.map(f => <FaqItem key={f.id} f={f} openFaq={openFaq} setOpenFaq={setOpenFaq} />)}
+            </div>
+          </div>
+        ))
+      ) : (
+        // Arama/filtre sonucu - kategorisiz düz liste
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {filtered.map(f => <FaqItem key={f.id} f={f} openFaq={openFaq} setOpenFaq={setOpenFaq} />)}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function FaqItem({ f, openFaq, setOpenFaq }) {
+  return (
+    <div style={{ border: '1px solid #222' }}>
+      <div className="faq-q" onClick={() => setOpenFaq(openFaq === f.id ? null : f.id)}>
+        <span>{f.question}</span>
+        <span style={{ color: '#E8000D', fontSize: 22, fontWeight: 300, flexShrink: 0 }}>{openFaq === f.id ? '−' : '+'}</span>
+      </div>
+      {openFaq === f.id && (
+        <div style={{ padding: '14px 18px', color: '#aaa', fontSize: 13, borderTop: '1px solid #222', background: '#111', lineHeight: 1.7 }}>{f.answer}</div>
+      )}
+    </div>
+  )
 }
