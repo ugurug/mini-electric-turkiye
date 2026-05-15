@@ -615,11 +615,14 @@ function UsersTab() {
     if (profileError) { setMessage('Hata: ' + profileError.message); return }
 
     if (editForm.password) {
-      const { error: passError } = await supabase.functions.invoke('update-user-password', {
-        body: { userId: editingUser.id, password: editForm.password }
+      const res = await fetch('/api/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: editingUser.id, password: editForm.password })
       })
-      if (passError) {
-        setMessage('Profil güncellendi fakat şifre değiştirilemedi. Supabase Edge Function gerekli.')
+      const data = await res.json()
+      if (!res.ok) {
+        setMessage('Hata: ' + data.error)
         setEditingUser(null)
         fetchUsers()
         return
