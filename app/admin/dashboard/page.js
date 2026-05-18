@@ -38,7 +38,7 @@ export default function AdminDashboard() {
     </div>
   )
 
-  const visibleTabs = role === 'super_admin' ? TABS : TABS.slice(0, 6)
+  const visibleTabs = role === 'super_admin' ? TABS : TABS.slice(0, 5)
 
   return (
     <div style={{ background: '#0A0A0A', minHeight: '100vh', fontFamily: "'Barlow', sans-serif", color: '#fff' }}>
