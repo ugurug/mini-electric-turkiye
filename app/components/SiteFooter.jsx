@@ -99,7 +99,7 @@ export default function SiteFooter() {
         </div>
 
         <div style={{ borderTop: '1px solid #1c1c1c', paddingTop: 22, textAlign: 'center', color: '#555', fontSize: 12, letterSpacing: 0.5 }}>
-          © {year} <span style={{ color: '#E8000D', fontFamily: "'Montserrat'", fontWeight: 700 }}>Mini Electric Türkiye</span> Fan Kulübü — Tüm hakları saklıdır.
+          © {year} <span style={{ color: '#E8000D', fontFamily: "'Montserrat'", fontWeight: 700 }}>Mini Electric Türkiye</span> Topluluğu — Tüm hakları saklıdır.
         </div>
       </div>
     </footer>
