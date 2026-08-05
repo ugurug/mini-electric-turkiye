@@ -14,3 +14,10 @@ export async function sb(path) {
     return []
   }
 }
+
+// Site geneli ayarlar (Kulübe Katıl aç/kapa + link). Tablo yoksa güvenli varsayılan.
+const DEFAULT_SETTINGS = { join_enabled: true, join_url: 'https://www.jotform.com/form/251503841296053' }
+export async function getSettings() {
+  const rows = await sb('site_settings?select=join_enabled,join_url&id=eq.1&limit=1')
+  return rows[0] || DEFAULT_SETTINGS
+}

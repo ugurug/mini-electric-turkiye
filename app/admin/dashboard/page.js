@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { iller } from '../../lib/iller'
 
 
-const TABS = ['Kampanyalar', 'Haberler', 'SSS', 'Yıkama Merkezleri', 'Yıkama Yorumları', 'Teknik Kütüphane', 'Etkinlikler', 'İş Birlikleri', 'Topluluk Rakamları', 'Kullanıcılar']
+const TABS = ['Kampanyalar', 'Haberler', 'SSS', 'Yıkama Merkezleri', 'Yıkama Yorumları', 'Teknik Kütüphane', 'Etkinlikler', 'İş Birlikleri', 'Topluluk Rakamları', 'Ayarlar', 'Kullanıcılar']
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
     </div>
   )
 
-  const visibleTabs = role === 'super_admin' ? TABS : TABS.slice(0, 9)
+  const visibleTabs = role === 'super_admin' ? TABS : TABS.slice(0, 10)
 
   return (
     <div style={{ background: '#0A0A0A', minHeight: '100vh', fontFamily: "'Barlow', sans-serif", color: '#fff' }}>
@@ -62,26 +62,47 @@ export default function AdminDashboard() {
         .form-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; color: #aaa; text-transform: uppercase; margin-bottom: 6px; display: block; }
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .badge { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px; font-weight: 600; }
+        .admin-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .adm-topbar-pad { padding: 0 24px; }
+        .adm-topbar-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 12px; }
+        .adm-shell-pad { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        .adm-tabs-wrap { max-width: 1200px; margin: 0 auto; display: flex; overflow-x: auto; }
+        .adm-tabs-mobile { display: none; padding: 10px 14px; }
+        .adm-tabs-mobile select { width: 100%; padding: 12px 14px; font-size: 15px; }
+        @media (max-width: 720px) {
+          .adm-topbar-pad { padding: 0 14px; }
+          .adm-topbar-inner { height: auto; padding: 10px 0; flex-wrap: wrap; gap: 8px; }
+          .adm-shell-pad { padding: 14px; }
+          .adm-email { display: none !important; }
+          .adm-sublabel { display: none !important; }
+          .adm-brand-text { font-size: 13px !important; }
+          .adm-tabs-wrap { display: none !important; }
+          .adm-tabs-mobile { display: block; }
+          .admin-form-grid { grid-template-columns: 1fr; }
+          .adm-title { font-size: 22px !important; }
+          table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+          input, textarea, select { font-size: 16px; }
+        }
       `}</style>
 
       {/* TOP BAR */}
-      <div style={{ background: '#0A0A0A', borderBottom: '2px solid #E8000D', padding: '0 24px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 56 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36 }}>
+      <div className="adm-topbar-pad" style={{ background: '#0A0A0A', borderBottom: '2px solid #E8000D' }}>
+        <div className="adm-topbar-inner">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+            <div style={{ width: 32, height: 32, flexShrink: 0 }}>
               <img src="/logo.png" alt="Mini Electric Türkiye" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
-            <span style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, color: '#fff' }}> MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
-            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 2, color: '#555', textTransform: 'uppercase', borderLeft: '1px solid #222', paddingLeft: 12 }}>Admin Paneli</span>
+            <span className="adm-brand-text" style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, letterSpacing: 1, color: '#fff', whiteSpace: 'nowrap' }}>MINI ELECTRIC <span style={{ color: '#E8000D' }}>TÜRKİYE</span></span>
+            <span className="adm-sublabel" style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 2, color: '#555', textTransform: 'uppercase', borderLeft: '1px solid #222', paddingLeft: 12 }}>Admin Paneli</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <span style={{ fontSize: 12, color: '#555', fontFamily: "'Barlow Condensed'", letterSpacing: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+            <span className="adm-email" style={{ fontSize: 12, color: '#555', fontFamily: "'Barlow Condensed'", letterSpacing: 1 }}>
               {user?.email} &nbsp;
-              <span style={{ color: role === 'super_admin' ? '#E8000D' : '#aaa', border: `1px solid ${role === 'super_admin' ? '#E8000D' : '#444'}`, padding: '2px 6px', fontSize: 10, letterSpacing: 1.5 }}>
-                {role === 'super_admin' ? 'SÜPER ADMİN' : 'ADMİN'}
-              </span>
             </span>
-            <a href="/" style={{ color: '#555', fontSize: 12, fontFamily: "'Barlow Condensed'", letterSpacing: 1, textDecoration: 'none' }}>← Site</a>
+            <span style={{ color: role === 'super_admin' ? '#E8000D' : '#aaa', border: `1px solid ${role === 'super_admin' ? '#E8000D' : '#444'}`, padding: '2px 6px', fontSize: 10, letterSpacing: 1.5, whiteSpace: 'nowrap' }}>
+              {role === 'super_admin' ? 'SÜPER ADMİN' : 'ADMİN'}
+            </span>
+            <a href="/" style={{ color: '#555', fontSize: 12, fontFamily: "'Barlow Condensed'", letterSpacing: 1, textDecoration: 'none', whiteSpace: 'nowrap' }}>← Site</a>
             <button onClick={handleLogout} className="btn-gray">Çıkış</button>
           </div>
         </div>
@@ -89,17 +110,24 @@ export default function AdminDashboard() {
 
       {/* TABS */}
       <div style={{ background: '#111', borderBottom: '1px solid #222' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', overflowX: 'auto' }}>
+        <div className="adm-tabs-wrap">
           {visibleTabs.map((tab, i) => (
             <button key={i} onClick={() => setActiveTab(i)} style={{ background: 'none', border: 'none', borderBottom: activeTab === i ? '2px solid #E8000D' : '2px solid transparent', color: activeTab === i ? '#fff' : '#555', fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: 1.5, textTransform: 'uppercase', fontWeight: 600, padding: '14px 20px', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'color 0.2s' }}>
               {tab}
             </button>
           ))}
         </div>
+        {/* Mobil: açılır menü */}
+        <div className="adm-tabs-mobile">
+          <label className="form-label" style={{ marginBottom: 6 }}>Bölüm</label>
+          <select value={activeTab} onChange={(e) => setActiveTab(Number(e.target.value))}>
+            {visibleTabs.map((tab, i) => <option key={i} value={i}>{tab}</option>)}
+          </select>
+        </div>
       </div>
 
       {/* TAB CONTENT */}
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: 24 }}>
+      <div className="adm-shell-pad">
         {activeTab === 0 && <CampaignsTab />}
         {activeTab === 1 && <NewsTab />}
         {activeTab === 2 && <FaqTab />}
@@ -109,7 +137,8 @@ export default function AdminDashboard() {
         {activeTab === 6 && <EventsTab />}
         {activeTab === 7 && <PartnersTab />}
         {activeTab === 8 && <StatsTab />}
-        {activeTab === 9 && role === 'super_admin' && <UsersTab />}
+        {activeTab === 9 && <SettingsTab />}
+        {activeTab === 10 && role === 'super_admin' && <UsersTab />}
       </div>
     </div>
   )
@@ -158,7 +187,7 @@ function CampaignsTab() {
     <TabLayout title="Kampanyalar" onAdd={() => { setForm({ title: '', description: '', start_at: '', end_at: '' }); setEditing(null); setShowForm(!showForm) }}>
       {showForm && (
         <FormBox title={editing ? 'Kampanyayı Düzenle' : 'Yeni Kampanya'}>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <form onSubmit={handleSubmit} className="admin-form-grid">
             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
               <label className="form-label">Başlık</label>
               <input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
@@ -294,7 +323,7 @@ function FaqTab() {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div className="form-group"><label className="form-label">Soru</label><input required value={form.question} onChange={e => setForm({ ...form, question: e.target.value })} /></div>
             <div className="form-group"><label className="form-label">Cevap</label><textarea rows={4} value={form.answer} onChange={e => setForm({ ...form, answer: e.target.value })} /></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="admin-form-grid">
               <div className="form-group"><label className="form-label">Sıra</label><input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: parseInt(e.target.value) })} /></div>
               <div className="form-group"><label className="form-label">Durum</label>
                 <select value={form.enabled ? 'true' : 'false'} onChange={e => setForm({ ...form, enabled: e.target.value === 'true' })}>
@@ -359,7 +388,7 @@ function TechDocsTab() {
     <TabLayout title="Teknik Kütüphane" onAdd={() => { setForm({ title: '', slug: '', category: '', summary: '', content: '', enabled: true, display_order: 0 }); setEditing(null); setShowForm(!showForm) }}>
       {showForm && (
         <FormBox title={editing ? 'Dokümanı Düzenle' : 'Yeni Doküman'}>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <form onSubmit={handleSubmit} className="admin-form-grid">
             <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Başlık</label><input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></div>
             <div className="form-group"><label className="form-label">Kategori</label><input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Pil, Menzil, Şarj..." /></div>
             <div className="form-group"><label className="form-label">URL (slug) <span style={{ color: '#555', fontWeight: 400 }}>(boş = otomatik)</span></label><input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} placeholder="pil-sagligi" /></div>
@@ -728,7 +757,7 @@ function UsersTab() {
       {/* YENİ KULLANICI FORMU */}
       {showForm && (
         <FormBox title="Yeni Admin Oluştur">
-          <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <form onSubmit={handleCreate} className="admin-form-grid">
             <div className="form-group"><label className="form-label">E-posta</label><input type="email" required value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
             <div className="form-group"><label className="form-label">Şifre</label><input type="password" required value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} /></div>
             <div className="form-group">
@@ -749,7 +778,7 @@ function UsersTab() {
       {/* DÜZENLEME FORMU */}
       {editingUser && (
         <FormBox title={`Düzenle: ${editingUser.email}`}>
-          <form onSubmit={handleUpdate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <form onSubmit={handleUpdate} className="admin-form-grid">
             <div className="form-group">
               <label className="form-label">Yeni Şifre <span style={{ color: '#555', fontWeight: 400 }}>(boş bırakılırsa değişmez)</span></label>
               <input type="password" placeholder="Yeni şifre..." value={editForm.password} onChange={e => setEditForm({ ...editForm, password: e.target.value })} disabled={isProtected(editingUser)} style={{ opacity: isProtected(editingUser) ? 0.4 : 1 }} />
@@ -848,7 +877,7 @@ function EventsTab() {
     <TabLayout title="Etkinlikler" onAdd={() => { setForm({ title: '', description: '', content: '', location: '', event_date: '', category: 'Buluşma', images: [] }); setEditing(null); setShowForm(!showForm) }}>
       {showForm && (
         <FormBox title={editing ? 'Etkinliği Düzenle' : 'Yeni Etkinlik'}>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <form onSubmit={handleSubmit} className="admin-form-grid">
             <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Başlık</label><input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></div>
             <div className="form-group"><label className="form-label">Tarih & Saat</label><input type="datetime-local" value={form.event_date} onChange={e => setForm({ ...form, event_date: e.target.value })} /></div>
             <div className="form-group"><label className="form-label">Konum</label><input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="İstanbul, Sarıyer" /></div>
@@ -914,7 +943,7 @@ function PartnersTab() {
     <TabLayout title="İş Birlikleri" onAdd={() => { setForm(empty); setEditing(null); setShowForm(!showForm) }}>
       {showForm && (
         <FormBox title={editing ? 'İş Birliğini Düzenle' : 'Yeni İş Birliği'}>
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <form onSubmit={handleSubmit} className="admin-form-grid">
             <div className="form-group"><label className="form-label">Firma Adı</label><input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
             <div className="form-group"><label className="form-label">Kategori</label><input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Servis / Sigorta / Aksesuar / Şarj" /></div>
             <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Kısa Açıklama</label><textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
@@ -959,9 +988,9 @@ function RepeatList({ label, hint, items, onChange, withHex = false, valueLabel 
       {hint && <div style={{ color: '#777', fontSize: 12, marginBottom: 8 }}>{hint}</div>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {rows.map((r, i) => (
-          <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <input style={{ flex: 2 }} placeholder="Etiket" value={r.label || ''} onChange={e => update(i, 'label', e.target.value)} />
-            <input style={{ flex: 1 }} type="number" placeholder={valueLabel} value={r.value ?? ''} onChange={e => update(i, 'value', Number(e.target.value) || 0)} />
+          <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <input style={{ flex: '2 1 140px', minWidth: 130 }} placeholder="Etiket" value={r.label || ''} onChange={e => update(i, 'label', e.target.value)} />
+            <input style={{ flex: '1 1 80px', minWidth: 80 }} type="number" placeholder={valueLabel} value={r.value ?? ''} onChange={e => update(i, 'value', Number(e.target.value) || 0)} />
             {withHex && <input type="color" value={r.hex || '#E8000D'} onChange={e => update(i, 'hex', e.target.value)} style={{ width: 44, height: 38, padding: 2, cursor: 'pointer' }} />}
             <button type="button" className="btn-danger" onClick={() => remove(i)}>×</button>
           </div>
@@ -1006,7 +1035,7 @@ function StatsTab() {
   return (
     <TabLayout title="Topluluk Rakamları" showAdd={false}>
       <FormBox title="Rakamları Düzenle (tek sayfa)">
-        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <form onSubmit={handleSubmit} className="admin-form-grid">
           <div className="form-group"><label className="form-label">Toplam Üye</label><input type="number" value={form.members} onChange={e => setForm({ ...form, members: e.target.value })} /></div>
           <div className="form-group"><label className="form-label">Şehir Sayısı</label><input type="number" value={form.cities} onChange={e => setForm({ ...form, cities: e.target.value })} /></div>
 
@@ -1026,12 +1055,60 @@ function StatsTab() {
   )
 }
 
+/* ─── SİTE AYARLARI ─── */
+function SettingsTab() {
+  const [form, setForm] = useState({ join_enabled: true, join_url: '' })
+  const [loading, setLoading] = useState(true)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => { load() }, [])
+  const load = async () => {
+    const { data } = await supabase.from('site_settings').select('*').eq('id', 1).maybeSingle()
+    if (data) setForm({ join_enabled: data.join_enabled, join_url: data.join_url || '' })
+    setLoading(false)
+  }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    await supabase.from('site_settings').upsert({ id: 1, join_enabled: form.join_enabled, join_url: form.join_url, updated_at: new Date().toISOString() }, { onConflict: 'id' })
+    setSaved(true); setTimeout(() => setSaved(false), 2500)
+  }
+
+  if (loading) return <TabLayout title="Ayarlar" showAdd={false}><div style={{ color: '#777' }}>Yükleniyor…</div></TabLayout>
+
+  return (
+    <TabLayout title="Ayarlar" showAdd={false}>
+      <FormBox title="Kulübe Katıl Butonu">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 560 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+            <input type="checkbox" checked={form.join_enabled} onChange={e => setForm({ ...form, join_enabled: e.target.checked })} style={{ width: 20, height: 20, flexShrink: 0 }} />
+            <span>
+              <span style={{ display: 'block', color: '#fff', fontWeight: 600, fontSize: 15 }}>“Kulübe Katıl” butonu {form.join_enabled ? 'açık' : 'kapalı'}</span>
+              <span style={{ display: 'block', color: '#888', fontSize: 13, marginTop: 2 }}>Kapalıyken buton ve linki sitede hiç görünmez (HTML kaynağında bile yer almaz).</span>
+            </span>
+          </label>
+
+          <div className="form-group">
+            <label className="form-label">Buton Linki (başvuru formu / grup linki)</label>
+            <input type="url" value={form.join_url} onChange={e => setForm({ ...form, join_url: e.target.value })} placeholder="https://..." disabled={!form.join_enabled} style={{ opacity: form.join_enabled ? 1 : 0.5 }} />
+            <span style={{ color: '#777', fontSize: 12 }}>Bu link header, ana sayfa, footer ve İletişim sayfasındaki tüm “Kulübe Katıl” butonlarında kullanılır.</span>
+          </div>
+
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button type="submit" className="btn-red">Kaydet</button>
+            {saved && <span style={{ color: '#27AE60', fontSize: 14 }}>✓ Kaydedildi</span>}
+          </div>
+        </form>
+      </FormBox>
+    </TabLayout>
+  )
+}
+
 /* ─── SHARED COMPONENTS ─── */
 function TabLayout({ title, children, onAdd, showAdd = true }) {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div style={{ fontFamily: "'Montserrat'", fontSize: 28, letterSpacing: 2 }}>{title}</div>
+        <div className="adm-title" style={{ fontFamily: "'Montserrat'", fontSize: 28, letterSpacing: 2 }}>{title}</div>
         {showAdd && <button className="btn-red" onClick={onAdd}>+ Yeni Ekle</button>}
       </div>
       {children}

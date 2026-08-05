@@ -1,7 +1,8 @@
-const JOTFORM = 'https://www.jotform.com/form/251503841296053'
+import { getSettings } from '../lib/data'
+
 const INSTAGRAM = 'https://instagram.com/minielectricturkiye'
 
-const columns = [
+const baseColumns = [
   {
     title: 'Topluluk',
     links: [
@@ -22,18 +23,20 @@ const columns = [
       { href: '/sss', label: 'Sık Sorulan Sorular' },
     ],
   },
-  {
+]
+
+export default async function SiteFooter() {
+  const year = new Date().getFullYear()
+  const s = await getSettings()
+  const iletisimCol = {
     title: 'İletişim',
     links: [
       { href: '/iletisim', label: 'İletişim' },
       { href: INSTAGRAM, label: 'Instagram', external: true },
-      { href: JOTFORM, label: 'Kulübe Katıl', external: true },
+      ...(s.join_enabled ? [{ href: s.join_url, label: 'Kulübe Katıl', external: true }] : []),
     ],
-  },
-]
-
-export default function SiteFooter() {
-  const year = new Date().getFullYear()
+  }
+  const columns = [...baseColumns, iletisimCol]
   return (
     <footer style={{ background: '#0a0a0a', borderTop: '1px solid #222', color: '#888', marginTop: 'auto' }}>
       <style>{`

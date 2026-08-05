@@ -1,7 +1,7 @@
 import SiteHeader from './components/SiteHeader'
 import SiteFooter from './components/SiteFooter'
 import StatCounters from './components/StatCounters'
-import { sb } from './lib/data'
+import { sb, getSettings } from './lib/data'
 
 export const metadata = {
   title: 'MINI Electric Türkiye — Elektrikli MINI Topluluğu',
@@ -56,12 +56,13 @@ function SectionHead({ title, href }) {
 
 export default async function Home() {
   const now = Date.now()
-  const [campaigns, events, partners, statsRows, eventIds] = await Promise.all([
+  const [campaigns, events, partners, statsRows, eventIds, settings] = await Promise.all([
     sb('campaigns?select=id,title,description,images,start_at,end_at&order=created_at.desc&limit=3'),
     sb('events?select=id,title,description,images,event_date,category&enabled=eq.true&order=event_date.desc&limit=3'),
     sb('partners?select=id,name,logo,url&enabled=eq.true&order=display_order.asc&limit=12'),
     sb('community_stats?select=members,cities,models&id=eq.1&limit=1'),
     sb('events?select=id&enabled=eq.true'),
+    getSettings(),
   ])
   const stats = statsRows[0] || {}
   const statModels = Array.isArray(stats.models) ? stats.models : []
@@ -88,7 +89,7 @@ export default async function Home() {
           <p style={{ color: '#bbb', fontSize: 14.5, fontWeight: 400, maxWidth: 560, margin: '0 auto 22px', lineHeight: 1.7 }}>
             Türkiye'nin dört bir yanından MINI Electric tutkunlarını bir araya getiren, deneyimleri paylaşan ve elektrikli sürüşün keyfini çıkaran Türkiye'nin en büyük Elektrikli MINI topluluğu.
           </p>
-          <a href={JOTFORM} target="_blank" rel="noreferrer" className="btn-red">Kulübe Katıl</a>
+          {settings.join_enabled && <a href={settings.join_url} target="_blank" rel="noreferrer" className="btn-red">Kulübe Katıl</a>}
 
           {hasStats && (
             <div style={{ maxWidth: 620, margin: '36px auto 0', paddingTop: 28, borderTop: '1px solid rgba(255,255,255,0.12)' }}>

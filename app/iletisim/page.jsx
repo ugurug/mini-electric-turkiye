@@ -1,5 +1,6 @@
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
+import { getSettings } from '../lib/data'
 
 export const metadata = {
   title: 'İletişim — MINI Electric Türkiye',
@@ -7,14 +8,13 @@ export const metadata = {
 }
 
 const INSTAGRAM = 'https://www.instagram.com/minielectricturkiye'
-const JOTFORM = 'https://www.jotform.com/form/251503841296053'
 
-const channels = [
-  { icon: '📸', label: 'Instagram', value: '@minielectricturkiye', href: INSTAGRAM, note: 'Bize ulaşmanın en hızlı yolu' },
-  { icon: '🎫', label: 'Kulübe Katıl', value: 'Başvuru formu', href: JOTFORM, note: 'Topluluğa katılmak için doldur' },
-]
-
-export default function Iletisim() {
+export default async function Iletisim() {
+  const settings = await getSettings()
+  const channels = [
+    { icon: '📸', label: 'Instagram', value: '@minielectricturkiye', href: INSTAGRAM, note: 'Bize ulaşmanın en hızlı yolu' },
+    ...(settings.join_enabled ? [{ icon: '🎫', label: 'Kulübe Katıl', value: 'Başvuru formu', href: settings.join_url, note: 'Topluluğa katılmak için doldur' }] : []),
+  ]
   return (
     <div style={{ background: '#f8f8f8', color: '#111', fontFamily: "'Inter', sans-serif", minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@300;400;500;600&display=swap');`}</style>
