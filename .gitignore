@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Büyük kaynak PDF'ler (içerik metne çıkarıldı, runtime'da kullanılmıyor)
+public/files/

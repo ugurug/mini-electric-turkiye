@@ -5,7 +5,7 @@ import { supabase } from '../../lib/supabase'
 import { iller } from '../../lib/iller'
 
 
-const TABS = ['Kampanyalar', 'Haberler', 'SSS', 'Yıkama Merkezleri', 'Yıkama Yorumları', 'Kullanıcılar']
+const TABS = ['Kampanyalar', 'Haberler', 'SSS', 'Yıkama Merkezleri', 'Yıkama Yorumları', 'Teknik Kütüphane', 'Etkinlikler', 'İş Birlikleri', 'Topluluk Rakamları', 'Kullanıcılar']
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
     </div>
   )
 
-  const visibleTabs = role === 'super_admin' ? TABS : TABS.slice(0, 5)
+  const visibleTabs = role === 'super_admin' ? TABS : TABS.slice(0, 9)
 
   return (
     <div style={{ background: '#0A0A0A', minHeight: '100vh', fontFamily: "'Barlow', sans-serif", color: '#fff' }}>
@@ -105,7 +105,11 @@ export default function AdminDashboard() {
         {activeTab === 2 && <FaqTab />}
         {activeTab === 3 && <CentersTab />}
         {activeTab === 4 && <CommentsTab />}
-        {activeTab === 5 && role === 'super_admin' && <UsersTab />}
+        {activeTab === 5 && <TechDocsTab />}
+        {activeTab === 6 && <EventsTab />}
+        {activeTab === 7 && <PartnersTab />}
+        {activeTab === 8 && <StatsTab />}
+        {activeTab === 9 && role === 'super_admin' && <UsersTab />}
       </div>
     </div>
   )
@@ -310,6 +314,71 @@ function FaqTab() {
             <tr key={item.id}>
               <td style={{ color: '#fff', fontWeight: 600 }}>{item.question}</td>
               <td style={{ maxWidth: 260 }}>{item.answer?.slice(0, 60)}...</td>
+              <td>{item.display_order}</td>
+              <td><button onClick={() => toggleEnabled(item)} className="badge" style={{ color: item.enabled ? '#27AE60' : '#555', border: `1px solid ${item.enabled ? '#27AE60' : '#555'}`, background: 'none', cursor: 'pointer' }}>{item.enabled ? 'Aktif' : 'Pasif'}</button></td>
+              <td><div style={{ display: 'flex', gap: 8 }}><button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button><button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button></div></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </TabLayout>
+  )
+}
+
+/* ─── TEKNİK KÜTÜPHANE ─── */
+function TechDocsTab() {
+  const [items, setItems] = useState([])
+  const [form, setForm] = useState({ title: '', slug: '', category: '', summary: '', content: '', enabled: true, display_order: 0 })
+  const [editing, setEditing] = useState(null)
+  const [showForm, setShowForm] = useState(false)
+
+  useEffect(() => { fetchItems() }, [])
+  const fetchItems = async () => {
+    const { data } = await supabase.from('technical_docs').select('*').order('display_order')
+    setItems(data || [])
+  }
+  const slugify = (s) => (s || '').toLowerCase()
+    .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const payload = { ...form, slug: form.slug || slugify(form.title) }
+    if (editing) { await supabase.from('technical_docs').update(payload).eq('id', editing) }
+    else { await supabase.from('technical_docs').insert([payload]) }
+    setForm({ title: '', slug: '', category: '', summary: '', content: '', enabled: true, display_order: 0 })
+    setEditing(null); setShowForm(false); fetchItems()
+  }
+  const handleEdit = (item) => {
+    setForm({ title: item.title, slug: item.slug || '', category: item.category || '', summary: item.summary || '', content: item.content || '', enabled: item.enabled, display_order: item.display_order })
+    setEditing(item.id); setShowForm(true)
+  }
+  const handleDelete = async (id) => { if (confirm('Bu dokümanı silmek istiyor musunuz?')) { await supabase.from('technical_docs').delete().eq('id', id); fetchItems() } }
+  const toggleEnabled = async (item) => { await supabase.from('technical_docs').update({ enabled: !item.enabled }).eq('id', item.id); fetchItems() }
+
+  return (
+    <TabLayout title="Teknik Kütüphane" onAdd={() => { setForm({ title: '', slug: '', category: '', summary: '', content: '', enabled: true, display_order: 0 }); setEditing(null); setShowForm(!showForm) }}>
+      {showForm && (
+        <FormBox title={editing ? 'Dokümanı Düzenle' : 'Yeni Doküman'}>
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Başlık</label><input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></div>
+            <div className="form-group"><label className="form-label">Kategori</label><input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Pil, Menzil, Şarj..." /></div>
+            <div className="form-group"><label className="form-label">URL (slug) <span style={{ color: '#555', fontWeight: 400 }}>(boş = otomatik)</span></label><input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} placeholder="pil-sagligi" /></div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Özet (Kartta görünür)</label><textarea rows={2} value={form.summary} onChange={e => setForm({ ...form, summary: e.target.value })} /></div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">İçerik <span style={{ color: '#555', fontWeight: 400 }}>(Alt başlık için satırın başına "## " yaz)</span></label><textarea rows={10} value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder={'Giriş paragrafı...\n\n## Alt Başlık\nParagraf metni...'} /></div>
+            <div className="form-group"><label className="form-label">Sıra</label><input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: parseInt(e.target.value) || 0 })} /></div>
+            <div className="form-group"><label className="form-label">Durum</label><select value={form.enabled ? 'true' : 'false'} onChange={e => setForm({ ...form, enabled: e.target.value === 'true' })}><option value="true">Aktif</option><option value="false">Pasif</option></select></div>
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}><button type="submit" className="btn-red">{editing ? 'Güncelle' : 'Kaydet'}</button><button type="button" className="btn-gray" onClick={() => { setShowForm(false); setEditing(null) }}>İptal</button></div>
+          </form>
+        </FormBox>
+      )}
+      <table>
+        <thead><tr><th>Başlık</th><th>Kategori</th><th>Sıra</th><th>Durum</th><th>İşlemler</th></tr></thead>
+        <tbody>
+          {items.length === 0 && <tr><td colSpan={5} style={{ color: '#555', textAlign: 'center' }}>Henüz doküman yok.</td></tr>}
+          {items.map(item => (
+            <tr key={item.id}>
+              <td style={{ color: '#fff', fontWeight: 600 }}>{item.title}</td>
+              <td>{item.category || '—'}</td>
               <td>{item.display_order}</td>
               <td><button onClick={() => toggleEnabled(item)} className="badge" style={{ color: item.enabled ? '#27AE60' : '#555', border: `1px solid ${item.enabled ? '#27AE60' : '#555'}`, background: 'none', cursor: 'pointer' }}>{item.enabled ? 'Aktif' : 'Pasif'}</button></td>
               <td><div style={{ display: 'flex', gap: 8 }}><button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button><button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button></div></td>
@@ -741,6 +810,218 @@ function UsersTab() {
           ))}
         </tbody>
       </table>
+    </TabLayout>
+  )
+}
+
+/* ─── ETKİNLİKLER ─── */
+function EventsTab() {
+  const [items, setItems] = useState([])
+  const [form, setForm] = useState({ title: '', description: '', content: '', location: '', event_date: '', category: 'Buluşma', images: [] })
+  const [editing, setEditing] = useState(null)
+  const [showForm, setShowForm] = useState(false)
+  const CATS = ['Buluşma', 'Sürüş', 'Sergi', 'İşbirliği']
+
+  useEffect(() => { fetchItems() }, [])
+  const fetchItems = async () => {
+    const { data } = await supabase.from('events').select('*').order('event_date', { ascending: false })
+    setItems(data || [])
+  }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const payload = { ...form, event_date: form.event_date || null }
+    if (editing) { await supabase.from('events').update(payload).eq('id', editing) }
+    else { await supabase.from('events').insert([payload]) }
+    setForm({ title: '', description: '', content: '', location: '', event_date: '', category: 'Buluşma', images: [] })
+    setEditing(null); setShowForm(false); fetchItems()
+  }
+  const handleEdit = (item) => {
+    setForm({ title: item.title, description: item.description || '', content: item.content || '', location: item.location || '', event_date: item.event_date?.slice(0, 16) || '', category: item.category || 'Buluşma', images: item.images || [] })
+    setEditing(item.id); setShowForm(true)
+  }
+  const handleDelete = async (id) => { if (confirm('Bu etkinliği silmek istiyor musunuz?')) { await supabase.from('events').delete().eq('id', id); fetchItems() } }
+
+  const now = new Date()
+  const statusOf = (item) => item.event_date && new Date(item.event_date) >= now ? { label: 'Yaklaşan', color: '#27AE60' } : { label: 'Geçmiş', color: '#555' }
+
+  return (
+    <TabLayout title="Etkinlikler" onAdd={() => { setForm({ title: '', description: '', content: '', location: '', event_date: '', category: 'Buluşma', images: [] }); setEditing(null); setShowForm(!showForm) }}>
+      {showForm && (
+        <FormBox title={editing ? 'Etkinliği Düzenle' : 'Yeni Etkinlik'}>
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Başlık</label><input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></div>
+            <div className="form-group"><label className="form-label">Tarih & Saat</label><input type="datetime-local" value={form.event_date} onChange={e => setForm({ ...form, event_date: e.target.value })} /></div>
+            <div className="form-group"><label className="form-label">Konum</label><input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="İstanbul, Sarıyer" /></div>
+            <div className="form-group"><label className="form-label">Kategori</label><select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>{CATS.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Kısa Açıklama (kart özeti)</label><textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Listede kartta görünen kısa özet" /></div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Detay (uzun metin — detay sayfası)</label><textarea rows={8} value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder={"Etkinliğin tüm detayları...\n\nBaşlık için satıra ## yazabilirsin. Paragrafları boş satırla ayır."} /></div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Görseller (ilki kapak, hepsi galeride)</label><ImageUploader images={form.images || []} onChange={(images) => setForm({ ...form, images })} /></div>
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}><button type="submit" className="btn-red">{editing ? 'Güncelle' : 'Kaydet'}</button><button type="button" className="btn-gray" onClick={() => { setShowForm(false); setEditing(null) }}>İptal</button></div>
+          </form>
+        </FormBox>
+      )}
+      <table>
+        <thead><tr><th>Başlık</th><th>Tarih</th><th>Konum</th><th>Kategori</th><th>Durum</th><th>İşlemler</th></tr></thead>
+        <tbody>
+          {items.length === 0 && <tr><td colSpan={6} style={{ color: '#555', textAlign: 'center' }}>Henüz etkinlik yok.</td></tr>}
+          {items.map(item => {
+            const s = statusOf(item)
+            return (
+              <tr key={item.id}>
+                <td style={{ color: '#fff', fontWeight: 600 }}>{item.title}</td>
+                <td>{item.event_date ? new Date(item.event_date).toLocaleDateString('tr-TR') : '—'}</td>
+                <td>{item.location || '—'}</td>
+                <td>{item.category || '—'}</td>
+                <td><span className="badge" style={{ color: s.color, border: `1px solid ${s.color}` }}>{s.label}</span></td>
+                <td><div style={{ display: 'flex', gap: 8 }}><button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button><button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button></div></td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </TabLayout>
+  )
+}
+
+/* ─── İŞ BİRLİKLERİ ─── */
+function PartnersTab() {
+  const [items, setItems] = useState([])
+  const [form, setForm] = useState({ name: '', category: '', description: '', benefit: '', url: '', logo: '', display_order: 0, enabled: true })
+  const [editing, setEditing] = useState(null)
+  const [showForm, setShowForm] = useState(false)
+  const empty = { name: '', category: '', description: '', benefit: '', url: '', logo: '', display_order: 0, enabled: true }
+
+  useEffect(() => { fetchItems() }, [])
+  const fetchItems = async () => {
+    const { data } = await supabase.from('partners').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: false })
+    setItems(data || [])
+  }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const payload = { ...form, display_order: Number(form.display_order) || 0 }
+    if (editing) { await supabase.from('partners').update(payload).eq('id', editing) }
+    else { await supabase.from('partners').insert([payload]) }
+    setForm(empty); setEditing(null); setShowForm(false); fetchItems()
+  }
+  const handleEdit = (item) => {
+    setForm({ name: item.name, category: item.category || '', description: item.description || '', benefit: item.benefit || '', url: item.url || '', logo: item.logo || '', display_order: item.display_order ?? 0, enabled: item.enabled })
+    setEditing(item.id); setShowForm(true)
+  }
+  const handleDelete = async (id) => { if (confirm('Bu iş birliğini silmek istiyor musunuz?')) { await supabase.from('partners').delete().eq('id', id); fetchItems() } }
+  const toggleEnabled = async (item) => { await supabase.from('partners').update({ enabled: !item.enabled }).eq('id', item.id); fetchItems() }
+
+  return (
+    <TabLayout title="İş Birlikleri" onAdd={() => { setForm(empty); setEditing(null); setShowForm(!showForm) }}>
+      {showForm && (
+        <FormBox title={editing ? 'İş Birliğini Düzenle' : 'Yeni İş Birliği'}>
+          <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div className="form-group"><label className="form-label">Firma Adı</label><input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
+            <div className="form-group"><label className="form-label">Kategori</label><input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="Servis / Sigorta / Aksesuar / Şarj" /></div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Kısa Açıklama</label><textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Üyelere Özel Fayda (indirim vb.)</label><input value={form.benefit} onChange={e => setForm({ ...form, benefit: e.target.value })} placeholder="Örn. Üyelere %15 servis indirimi" /></div>
+            <div className="form-group"><label className="form-label">Firma Linki (opsiyonel)</label><input value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="https://..." /></div>
+            <div className="form-group"><label className="form-label">Sıra (küçük = önce)</label><input type="number" value={form.display_order} onChange={e => setForm({ ...form, display_order: e.target.value })} /></div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Logo</label><ImageUploader images={form.logo ? [form.logo] : []} onChange={(arr) => setForm({ ...form, logo: arr[arr.length - 1] || '' })} /></div>
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 8 }}><button type="submit" className="btn-red">{editing ? 'Güncelle' : 'Kaydet'}</button><button type="button" className="btn-gray" onClick={() => { setShowForm(false); setEditing(null) }}>İptal</button></div>
+          </form>
+        </FormBox>
+      )}
+      <table>
+        <thead><tr><th>Logo</th><th>Firma</th><th>Kategori</th><th>Fayda</th><th>Sıra</th><th>Durum</th><th>İşlemler</th></tr></thead>
+        <tbody>
+          {items.length === 0 && <tr><td colSpan={7} style={{ color: '#555', textAlign: 'center' }}>Henüz iş birliği yok.</td></tr>}
+          {items.map(item => (
+            <tr key={item.id}>
+              <td>{item.logo ? <img src={item.logo} alt={item.name} style={{ width: 44, height: 44, objectFit: 'contain', background: '#fff', borderRadius: 6 }} /> : '—'}</td>
+              <td style={{ color: '#fff', fontWeight: 600 }}>{item.name}</td>
+              <td>{item.category || '—'}</td>
+              <td style={{ maxWidth: 220, color: '#bbb', fontSize: 13 }}>{item.benefit || '—'}</td>
+              <td>{item.display_order}</td>
+              <td><button onClick={() => toggleEnabled(item)} className="badge" style={{ color: item.enabled ? '#27AE60' : '#555', border: `1px solid ${item.enabled ? '#27AE60' : '#555'}`, background: 'none', cursor: 'pointer' }}>{item.enabled ? 'Aktif' : 'Pasif'}</button></td>
+              <td><div style={{ display: 'flex', gap: 8 }}><button className="btn-gray" onClick={() => handleEdit(item)}>Düzenle</button><button className="btn-danger" onClick={() => handleDelete(item.id)}>Sil</button></div></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </TabLayout>
+  )
+}
+
+/* ─── TOPLULUK RAKAMLARI ─── */
+function RepeatList({ label, hint, items, onChange, withHex = false, valueLabel = 'Değer' }) {
+  const rows = Array.isArray(items) ? items : []
+  const update = (i, key, val) => { const next = rows.map((r, j) => j === i ? { ...r, [key]: val } : r); onChange(next) }
+  const add = () => onChange([...rows, withHex ? { label: '', value: 0, hex: '#E8000D' } : { label: '', value: 0 }])
+  const remove = (i) => onChange(rows.filter((_, j) => j !== i))
+  return (
+    <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+      <label className="form-label">{label}</label>
+      {hint && <div style={{ color: '#777', fontSize: 12, marginBottom: 8 }}>{hint}</div>}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {rows.map((r, i) => (
+          <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <input style={{ flex: 2 }} placeholder="Etiket" value={r.label || ''} onChange={e => update(i, 'label', e.target.value)} />
+            <input style={{ flex: 1 }} type="number" placeholder={valueLabel} value={r.value ?? ''} onChange={e => update(i, 'value', Number(e.target.value) || 0)} />
+            {withHex && <input type="color" value={r.hex || '#E8000D'} onChange={e => update(i, 'hex', e.target.value)} style={{ width: 44, height: 38, padding: 2, cursor: 'pointer' }} />}
+            <button type="button" className="btn-danger" onClick={() => remove(i)}>×</button>
+          </div>
+        ))}
+        <button type="button" className="btn-gray" onClick={add} style={{ alignSelf: 'flex-start' }}>+ Satır Ekle</button>
+      </div>
+    </div>
+  )
+}
+
+function StatsTab() {
+  const empty = { members: 0, cities: 0, survey_summary: '', models: [], colors: [], cities_dist: [], growth: [] }
+  const [form, setForm] = useState(empty)
+  const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => { load() }, [])
+  const load = async () => {
+    const { data } = await supabase.from('community_stats').select('*').eq('id', 1).maybeSingle()
+    if (data) setForm({
+      members: data.members || 0, cities: data.cities || 0, survey_summary: data.survey_summary || '',
+      models: data.models || [], colors: data.colors || [], cities_dist: data.cities_dist || [], growth: data.growth || [],
+    })
+    setLoading(false)
+  }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const payload = {
+      id: 1,
+      members: Number(form.members) || 0,
+      cities: Number(form.cities) || 0,
+      survey_summary: form.survey_summary,
+      models: form.models, colors: form.colors, cities_dist: form.cities_dist, growth: form.growth,
+      updated_at: new Date().toISOString(),
+    }
+    await supabase.from('community_stats').upsert(payload, { onConflict: 'id' })
+    setSaved(true); setTimeout(() => setSaved(false), 2500)
+  }
+
+  if (loading) return <TabLayout title="Topluluk Rakamları" showAdd={false}><div style={{ color: '#777' }}>Yükleniyor…</div></TabLayout>
+
+  return (
+    <TabLayout title="Topluluk Rakamları" showAdd={false}>
+      <FormBox title="Rakamları Düzenle (tek sayfa)">
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="form-group"><label className="form-label">Toplam Üye</label><input type="number" value={form.members} onChange={e => setForm({ ...form, members: e.target.value })} /></div>
+          <div className="form-group"><label className="form-label">Şehir Sayısı</label><input type="number" value={form.cities} onChange={e => setForm({ ...form, cities: e.target.value })} /></div>
+
+          <RepeatList label="Model Dağılımı" hint="Örn. Cooper SE → 120" items={form.models} onChange={v => setForm({ ...form, models: v })} valueLabel="Adet" />
+          <RepeatList label="Renk Dağılımı" hint="Renk seç, adet gir" items={form.colors} onChange={v => setForm({ ...form, colors: v })} withHex valueLabel="Adet" />
+          <RepeatList label="Şehir Dağılımı" hint="Örn. İstanbul → 210" items={form.cities_dist} onChange={v => setForm({ ...form, cities_dist: v })} valueLabel="Üye" />
+
+          <div className="form-group" style={{ gridColumn: '1 / -1' }}><label className="form-label">Kasko Anketi Özeti (opsiyonel)</label><textarea rows={4} value={form.survey_summary} onChange={e => setForm({ ...form, survey_summary: e.target.value })} /></div>
+
+          <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 12, alignItems: 'center' }}>
+            <button type="submit" className="btn-red">Kaydet</button>
+            {saved && <span style={{ color: '#27AE60', fontSize: 14 }}>✓ Kaydedildi</span>}
+          </div>
+        </form>
+      </FormBox>
     </TabLayout>
   )
 }

@@ -22,11 +22,15 @@ select option { background: #fff; }
 .section-inner { max-width: 960px; margin: 0 auto; padding: 56px 20px; }
 @media (max-width: 600px) { .section-inner { padding: 40px 16px; } }
 .section-alt { background: #fff; }
-.hero-title { font-size: 52px; letter-spacing: -1px; }
-@media (max-width: 500px) { .hero-title { font-size: 32px; } }
+.hero-title { font-size: 40px; letter-spacing: -1px; }
+@media (max-width: 500px) { .hero-title { font-size: 28px; } }
 
 .campaign-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
 @media (max-width: 600px) { .campaign-grid { grid-template-columns: 1fr; } }
+
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 860px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .grid-3 { grid-template-columns: 1fr; } }
 
 .faq-q { padding: 16px 20px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #111; display: flex; justify-content: space-between; align-items: center; background: #fff; user-select: none; gap: 12px; border-radius: 8px; }
 .faq-q:hover { background: #fafafa; }

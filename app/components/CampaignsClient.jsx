@@ -6,40 +6,32 @@ function Empty({ text }) {
 }
 
 function CampaignCard({ campaign, active }) {
-  const [open, setOpen] = useState(false)
+  const cover = Array.isArray(campaign.images) && campaign.images.length ? campaign.images[0] : null
+  const start = campaign.start_at ? new Date(campaign.start_at).toLocaleDateString('tr-TR') : null
+  const end = campaign.end_at ? new Date(campaign.end_at).toLocaleDateString('tr-TR') : null
   return (
-    <div className="card" style={{ opacity: active ? 1 : 0.7, borderTop: `3px solid ${active ? '#E8000D' : '#ddd'}` }}>
-      <div onClick={() => setOpen(!open)} style={{ padding: 20, cursor: 'pointer', userSelect: 'none' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: "'Montserrat'", fontSize: 16, fontWeight: 800, color: '#111', marginBottom: 8 }}>{campaign.title}</div>
-            <div style={{ color: '#666', fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>{campaign.description}</div>
-            <div style={{ fontSize: 11, color: '#999' }}>
-              <span style={{ color: '#E8000D', fontWeight: 600 }}>Başlangıç:</span> {new Date(campaign.start_at).toLocaleDateString('tr-TR')}
-              &nbsp;·&nbsp;
-              <span style={{ color: '#E8000D', fontWeight: 600 }}>Bitiş:</span> {new Date(campaign.end_at).toLocaleDateString('tr-TR')}
-            </div>
-          </div>
-          <div style={{ color: '#E8000D', fontSize: 22, fontWeight: 300, flexShrink: 0 }}>{open ? '−' : '+'}</div>
-        </div>
-      </div>
-      {open && (
-        <div style={{ borderTop: '1px solid #f5f5f5', padding: '16px 20px', background: '#fafafa' }}>
-          {campaign.details
-            ? <div style={{ color: '#444', fontSize: 14, lineHeight: 1.8, marginBottom: campaign.images?.length > 0 ? 16 : 0, whiteSpace: 'pre-wrap' }}>{campaign.details}</div>
-            : !campaign.images?.length && <div style={{ color: '#bbb', fontSize: 13 }}>Detay eklenmemiş.</div>
-          }
-          {campaign.images?.length > 0 && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
-              {campaign.images.map((url, i) => (
-                <img key={i} src={url} alt="" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6, cursor: 'pointer' }}
-                  onClick={(e) => { e.stopPropagation(); window.open(url, '_blank') }} />
-              ))}
-            </div>
-          )}
+    <a href={`/kampanyalar/${campaign.id}`} className="card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', textDecoration: 'none', color: 'inherit', opacity: active ? 1 : 0.85, borderTop: `3px solid ${active ? '#E8000D' : '#ddd'}` }}>
+      {cover && (
+        <div style={{ width: '100%', aspectRatio: '16 / 9', overflow: 'hidden', background: '#f4f4f4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src={cover} alt={campaign.title} style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain', display: 'block', filter: active ? 'none' : 'grayscale(0.4)' }} />
         </div>
       )}
-    </div>
+      <div style={{ padding: 20, display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ marginBottom: 10 }}>
+          <span className="tag" style={active ? { background: '#E8000D', color: '#fff', borderColor: '#E8000D' } : {}}>{active ? 'Aktif' : 'Tamamlandı'}</span>
+        </div>
+        <div style={{ fontFamily: "'Montserrat'", fontSize: 17, fontWeight: 800, color: '#111', marginBottom: 8, lineHeight: 1.25 }}>{campaign.title}</div>
+        {campaign.description && <div style={{ color: '#666', fontSize: 13.5, lineHeight: 1.6, marginBottom: 12 }}>{campaign.description}</div>}
+        {(start || end) && (
+          <div style={{ fontSize: 11.5, color: '#999', marginBottom: 12 }}>
+            {start && <><span style={{ color: '#E8000D', fontWeight: 600 }}>Başlangıç:</span> {start}</>}
+            {start && end && <>&nbsp;·&nbsp;</>}
+            {end && <><span style={{ color: '#E8000D', fontWeight: 600 }}>Bitiş:</span> {end}</>}
+          </div>
+        )}
+        <span style={{ marginTop: 'auto', color: '#E8000D', fontSize: 13, fontWeight: 600 }}>Detayları gör →</span>
+      </div>
+    </a>
   )
 }
 
@@ -53,7 +45,7 @@ export default function CampaignsClient({ campaigns = [] }) {
     <>
       {activeCampaigns.length === 0
         ? <Empty text="Şu an aktif kampanya bulunmuyor." />
-        : <div className="campaign-grid">{activeCampaigns.map(c => <CampaignCard key={c.id} campaign={c} active />)}</div>
+        : <div className="grid-3">{activeCampaigns.map(c => <CampaignCard key={c.id} campaign={c} active />)}</div>
       }
 
       {finalizedCampaigns.length > 0 && (
@@ -65,7 +57,7 @@ export default function CampaignsClient({ campaigns = [] }) {
             </button>
           </div>
           {showFinalized && (
-            <div className="campaign-grid" style={{ marginTop: 20 }}>
+            <div className="grid-3" style={{ marginTop: 20 }}>
               {finalizedCampaigns.map(c => <CampaignCard key={c.id} campaign={c} active={false} />)}
             </div>
           )}
