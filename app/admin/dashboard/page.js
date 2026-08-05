@@ -1084,7 +1084,7 @@ function ImageUploader({ images, onChange }) {
           {images.map((url, i) => (
             <div key={i} style={{ position: 'relative' }}>
               <img src={url} alt="" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', border: '1px solid #333' }} />
-              <button onClick={() => handleRemove(url)} style={{ position: 'absolute', top: 4, right: 4, background: '#E8000D', border: 'none', color: '#fff', width: 22, height: 22, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+              <button type="button" onClick={() => handleRemove(url)} style={{ position: 'absolute', top: 4, right: 4, background: '#E8000D', border: 'none', color: '#fff', width: 22, height: 22, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
             </div>
           ))}
         </div>
