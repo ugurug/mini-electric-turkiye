@@ -5,9 +5,8 @@ const JOTFORM = 'https://www.jotform.com/form/251503841296053'
 
 const links = [
   { href: '/hakkimizda', label: 'Hakkımızda' },
+  { href: '/etkinlikler', label: 'Etkinlikler' },
   { href: '/kampanyalar', label: 'Kampanyalar' },
-  { href: '/yikama', label: 'Yıkama' },
-  { href: '/sss', label: 'SSS' },
   { href: '/iletisim', label: 'İletişim' },
 ]
 
