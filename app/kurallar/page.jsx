@@ -2,7 +2,7 @@ import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 
 export const metadata = {
-  title: 'Topluluk Kuralları — MINI Electric Türkiye',
+  title: 'Topluluk Kuralları  —  MINI Electric Türkiye',
   description: 'MINI Electric Türkiye topluluğunun katılım ve davranış kuralları. Herkesin kendini rahat ve güvende hissettiği bir topluluk için temel ilkeler.',
 }
 
